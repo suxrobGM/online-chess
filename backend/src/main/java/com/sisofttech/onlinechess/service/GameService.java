@@ -1,9 +1,12 @@
 package com.sisofttech.onlinechess.service;
 
 import com.sisofttech.onlinechess.model.Game;
+import com.sisofttech.onlinechess.model.Player;
 import com.sisofttech.onlinechess.repository.GameRepository;
 import com.sisofttech.onlinechess.repository.PlayerRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -19,12 +22,22 @@ public class GameService {
     /**
      * Create a new game
      * @param whitePlayerId The ID of the player who will play as white
+     * @param blackPlayerId The ID of the player who will play as black
+     * @throws NoSuchElementException if the white player does not exist, or if the black player does not exist
      * @return The newly created game
      */
-    public Game createGame(UUID whitePlayerId) {
-        var player = playerRepository.findById(whitePlayerId).orElseThrow();
+    public Game createGame(UUID whitePlayerId, UUID blackPlayerId) {
+        var whitePlayer = playerRepository.findById(whitePlayerId).orElseThrow();
+        Player blackPlayer = null;
+
+        if (blackPlayerId != null) {
+            blackPlayer = playerRepository.findById(blackPlayerId).orElseThrow();
+        }
+
         var game = new Game();
-        game.setWhitePlayer(player);
+        game.setWhitePlayer(whitePlayer);
+        game.setBlackPlayer(blackPlayer);
+        game.setCurrentTurnPlayerId(whitePlayer.getId());
         game.setStatus(Game.GameStatus.OPEN);
         return gameRepository.save(game);
     }
@@ -33,17 +46,32 @@ public class GameService {
      * Join a game as the black player
      * @param gameId The ID of the game to join
      * @param blackPlayerId The ID of the player who will play as black
+     * @throws IllegalStateException if the game is already full
      * @return The updated game
      */
     public Game joinGame(UUID gameId, UUID blackPlayerId) {
-        Game game = gameRepository.findById(gameId).orElseThrow();
+        var game = gameRepository.findById(gameId).orElseThrow();
+
         if (game.getBlackPlayer() != null) {
             throw new IllegalStateException("Game is already full.");
         }
 
         var player = playerRepository.findById(blackPlayerId).orElseThrow();
         game.setBlackPlayer(player);
+        game.setCurrentTurnPlayerId(player.getId());
         game.setStatus(Game.GameStatus.ONGOING);
+        return gameRepository.save(game);
+    }
+
+    /**
+     * Set the current turn player
+     * @param gameId The ID of the game
+     * @param playerId The ID of the player whose turn it is
+     * @return The updated game
+     */
+    public Game setCurrentTurnPlayer(UUID gameId, UUID playerId) {
+        var game = gameRepository.findById(gameId).orElseThrow();
+        game.setCurrentTurnPlayerId(playerId);
         return gameRepository.save(game);
     }
 
@@ -59,7 +87,7 @@ public class GameService {
 
         if (winnerId != null) {
             var winner = playerRepository.findById(winnerId).orElseThrow();
-            game.setWinner(winner);
+            game.setWinnerPlayer(winner);
         }
 
         return gameRepository.save(game);
@@ -75,7 +103,7 @@ public class GameService {
         var game = gameRepository.findById(gameId).orElseThrow();
         game.setStatus(Game.GameStatus.RESIGNED);
         var winner = game.getWhitePlayer().getId().equals(playerId) ? game.getBlackPlayer() : game.getWhitePlayer();
-        game.setWinner(winner);
+        game.setWinnerPlayer(winner);
         return gameRepository.save(game);
     }
 

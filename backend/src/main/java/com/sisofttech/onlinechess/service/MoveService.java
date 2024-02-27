@@ -44,8 +44,8 @@ public class MoveService {
         move.setToPosition(toPosition);
         move.setPiece(piece);
         move.setCapturedPiece(capturedPiece);
-        move.setIsCheck(isCheck);
-        move.setIsCheckmate(isCheckmate);
+        move.setCheck(isCheck);
+        move.setCheckmate(isCheckmate);
         move.setCapturedPiece(capturedPiece);
 
         // Calculate and set moveNumber based on the last move of this game

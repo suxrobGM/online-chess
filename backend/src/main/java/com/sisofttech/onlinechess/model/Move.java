@@ -96,19 +96,19 @@ public class Move {
         this.capturedPiece = capturedPiece;
     }
 
-    public boolean getIsCheck() {
+    public boolean isCheck() {
         return isCheck;
     }
 
-    public void setIsCheck(boolean isCheck) {
+    public void setCheck(boolean isCheck) {
         this.isCheck = isCheck;
     }
 
-    public boolean getIsCheckmate() {
+    public boolean isCheckmate() {
         return isCheckmate;
     }
 
-    public void setIsCheckmate(boolean isCheckmate) {
+    public void setCheckmate(boolean isCheckmate) {
         this.isCheckmate = isCheckmate;
     }
 }

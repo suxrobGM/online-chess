@@ -7,88 +7,79 @@ public class GameDto {
     private String winnerPlayerId;
     private String status;
     private String turnPlayerId;
-    private String check;
-    private String checkmate;
-    private String stalemate;
-    private String draw;
-    private String resign;
-    private String moveCount;
+//    private boolean isCheck;
+//    private boolean isCheckmate;
     private String createdAt;
-    private String updatedAt;
-
-    public GameDto() {
-    }
-
-    public GameDto(String id, String whitePlayerId, String blackPlayerId, String winnerPlayerId, String status, String turnPlayerId, String check, String checkmate, String stalemate, String draw, String resign, String moveCount, String createdAt, String updatedAt) {
-        this.id = id;
-        this.whitePlayerId = whitePlayerId;
-        this.blackPlayerId = blackPlayerId;
-        this.winnerPlayerId = winnerPlayerId;
-        this.status = status;
-        this.turnPlayerId = turnPlayerId;
-        this.check = check;
-        this.checkmate = checkmate;
-        this.stalemate = stalemate;
-        this.draw = draw;
-        this.resign = resign;
-        this.moveCount = moveCount;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-    }
 
     public String getId() {
         return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getWhitePlayerId() {
         return whitePlayerId;
     }
 
+    public void setWhitePlayerId(String whitePlayerId) {
+        this.whitePlayerId = whitePlayerId;
+    }
+
     public String getBlackPlayerId() {
         return blackPlayerId;
+    }
+
+    public void setBlackPlayerId(String blackPlayerId) {
+        this.blackPlayerId = blackPlayerId;
     }
 
     public String getWinnerPlayerId() {
         return winnerPlayerId;
     }
 
-    public String getStatus() {
-        return status;
+    public void setWinnerPlayerId(String winnerPlayerId) {
+        this.winnerPlayerId = winnerPlayerId;
     }
 
     public String getTurnPlayerId() {
         return turnPlayerId;
     }
 
-    public String getCheck() {
-        return check;
+    public void setTurnPlayerId(String turnPlayerId) {
+        this.turnPlayerId = turnPlayerId;
     }
 
-    public String getCheckmate() {
-        return checkmate;
+    public String getStatus() {
+        return status;
     }
 
-    public String getStalemate() {
-        return stalemate;
-    }
-
-    public String getDraw() {
-        return draw;
-    }
-
-    public String getResign() {
-        return resign;
-    }
-
-    public String getMoveCount() {
-        return moveCount;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public String getCreatedAt() {
         return createdAt;
     }
 
-    public String getUpdatedAt() {
-        return updatedAt;
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
     }
+
+//    public boolean isCheck() {
+//        return isCheck;
+//    }
+//
+//    public void setCheck(boolean check) {
+//        isCheck = check;
+//    }
+//
+//    public boolean isCheckmate() {
+//        return isCheckmate;
+//    }
+//
+//    public void setCheckmate(boolean checkmate) {
+//        isCheckmate = checkmate;
+//    }
 }

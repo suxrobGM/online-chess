@@ -1,7 +1,10 @@
 package com.sisofttech.onlinechess.model;
 
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -20,17 +23,24 @@ public class Game {
     @JoinColumn(name = "black_player_id", nullable = false)
     private Player blackPlayer;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "winner_player_id")
+    private Player winnerPlayer;
+
+    @Column(name = "current_turn_player_id", nullable = false)
+    private UUID currentTurnPlayerId;
+
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private GameStatus status;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "winner_id")
-    private Player winner;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at", nullable = false)
     private Date createdAt;
+
+    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<Move> moves = new ArrayList<>();
 
     public UUID getId() {
         return id;
@@ -52,6 +62,14 @@ public class Game {
         this.blackPlayer = playerTwoId;
     }
 
+    public UUID getCurrentTurnPlayerId() {
+        return currentTurnPlayerId;
+    }
+
+    public void setCurrentTurnPlayerId(UUID currentTurnPlayerId) {
+        this.currentTurnPlayerId = currentTurnPlayerId;
+    }
+
     public GameStatus getStatus() {
         return status;
     }
@@ -60,12 +78,16 @@ public class Game {
         this.status = status;
     }
 
-    public Player getWinner() {
-        return winner;
+    public Player getWinnerPlayer() {
+        return winnerPlayer;
     }
 
-    public void setWinner(Player winner) {
-        this.winner = winner;
+    public void setWinnerPlayer(Player winnerPlayer) {
+        this.winnerPlayer = winnerPlayer;
+    }
+
+    public List<Move> getMoves() {
+        return moves;
     }
 
     public Date getCreatedAt() {

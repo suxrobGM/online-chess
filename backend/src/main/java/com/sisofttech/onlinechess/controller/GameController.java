@@ -1,17 +1,20 @@
 package com.sisofttech.onlinechess.controller;
 
-import com.sisofttech.onlinechess.model.Game;
-import com.sisofttech.onlinechess.repository.GameRepository;
+import com.sisofttech.onlinechess.dto.CreateGameDto;
+import com.sisofttech.onlinechess.dto.GameDto;
+import com.sisofttech.onlinechess.mapper.GameMapper;
+import com.sisofttech.onlinechess.service.GameService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/games")
 public class GameController {
-    private final GameRepository gameRepository;
+    private final GameService gameService;
 
-    public GameController(GameRepository gameRepository) {
-        this.gameRepository = gameRepository;
+    public GameController(GameService gameService) {
+        this.gameService = gameService;
     }
 
     @GetMapping("/test")
@@ -19,15 +22,13 @@ public class GameController {
         return "Test successful!";
     }
 
-    // List all games
-    @GetMapping()
-    public List<Game> getAllGames() {
-        return gameRepository.findAll();
-    }
-
     // Create a new game
     @PostMapping
-    public Game createGame(@RequestBody Game game) {
-        return gameRepository.save(game);
+    public ResponseEntity<GameDto> createGame(@RequestBody CreateGameDto createGameDto) {
+        var whitePlayerId = UUID.fromString(createGameDto.getWhitePlayerId());
+        var blackPlayerId = createGameDto.getBlackPlayerId() != null ? UUID.fromString(createGameDto.getBlackPlayerId()) : null;
+        var game = gameService.createGame(whitePlayerId, blackPlayerId);
+        var gameDto = GameMapper.toDto(game);
+        return ResponseEntity.ok(gameDto);
     }
 }
