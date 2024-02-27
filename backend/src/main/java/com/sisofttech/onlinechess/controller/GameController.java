@@ -14,6 +14,11 @@ public class GameController {
         this.gameRepository = gameRepository;
     }
 
+    @GetMapping("/test")
+    public String test() {
+        return "Test successful!";
+    }
+
     // List all games
     @GetMapping()
     public List<Game> getAllGames() {

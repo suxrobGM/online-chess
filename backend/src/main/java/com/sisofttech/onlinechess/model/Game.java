@@ -73,7 +73,10 @@ public class Game {
     }
 
     public enum GameStatus {
+        OPEN,
         ONGOING,
-        FINISHED
+        DRAW,
+        RESIGNED,
+        COMPLETED
     }
 }
