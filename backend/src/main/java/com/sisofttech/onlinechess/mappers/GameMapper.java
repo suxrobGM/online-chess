@@ -1,4 +1,4 @@
-package com.sisofttech.onlinechess.mapper;
+package com.sisofttech.onlinechess.mappers;
 
 import com.sisofttech.onlinechess.dto.GameDto;
 import com.sisofttech.onlinechess.model.Game;

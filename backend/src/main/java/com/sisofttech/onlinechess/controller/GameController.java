@@ -2,8 +2,8 @@ package com.sisofttech.onlinechess.controller;
 
 import com.sisofttech.onlinechess.dto.CreateGameDto;
 import com.sisofttech.onlinechess.dto.GameDto;
-import com.sisofttech.onlinechess.mapper.GameMapper;
-import com.sisofttech.onlinechess.service.GameService;
+import com.sisofttech.onlinechess.mappers.GameMapper;
+import com.sisofttech.onlinechess.services.GameService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
@@ -22,7 +22,11 @@ public class GameController {
         return "Test successful!";
     }
 
-    // Create a new game
+    /**
+     * Create a new chess game
+     * @param createGameDto - the game to create, with the white player's ID and optionally the black player's ID
+     * @return The newly created game as a DTO
+     */
     @PostMapping
     public ResponseEntity<GameDto> createGame(@RequestBody CreateGameDto createGameDto) {
         var whitePlayerId = UUID.fromString(createGameDto.getWhitePlayerId());

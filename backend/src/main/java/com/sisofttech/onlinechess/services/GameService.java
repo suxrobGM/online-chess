@@ -1,4 +1,4 @@
-package com.sisofttech.onlinechess.service;
+package com.sisofttech.onlinechess.services;
 
 import com.sisofttech.onlinechess.model.Game;
 import com.sisofttech.onlinechess.model.Player;
