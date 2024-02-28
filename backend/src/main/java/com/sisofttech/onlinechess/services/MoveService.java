@@ -1,8 +1,8 @@
 package com.sisofttech.onlinechess.services;
 
-import com.sisofttech.onlinechess.model.Move;
-import com.sisofttech.onlinechess.repository.GameRepository;
-import com.sisofttech.onlinechess.repository.MoveRepository;
+import com.sisofttech.onlinechess.models.Move;
+import com.sisofttech.onlinechess.repositories.GameRepository;
+import com.sisofttech.onlinechess.repositories.MoveRepository;
 import org.springframework.stereotype.Service;
 import java.util.UUID;
 

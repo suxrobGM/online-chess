@@ -1,4 +1,4 @@
-package com.sisofttech.onlinechess.controller;
+package com.sisofttech.onlinechess.controllers;
 
 import com.sisofttech.onlinechess.dto.CreateGameDto;
 import com.sisofttech.onlinechess.dto.GameDto;

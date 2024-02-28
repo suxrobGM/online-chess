@@ -1,6 +1,6 @@
-package com.sisofttech.onlinechess.repository;
+package com.sisofttech.onlinechess.repositories;
 
-import com.sisofttech.onlinechess.model.Game;
+import com.sisofttech.onlinechess.models.Game;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.UUID;
 

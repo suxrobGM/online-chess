@@ -1,4 +1,4 @@
-package com.sisofttech.onlinechess.model;
+package com.sisofttech.onlinechess.models;
 
 import jakarta.persistence.*;
 

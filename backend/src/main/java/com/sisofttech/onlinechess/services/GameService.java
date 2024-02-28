@@ -1,9 +1,9 @@
 package com.sisofttech.onlinechess.services;
 
-import com.sisofttech.onlinechess.model.Game;
-import com.sisofttech.onlinechess.model.Player;
-import com.sisofttech.onlinechess.repository.GameRepository;
-import com.sisofttech.onlinechess.repository.PlayerRepository;
+import com.sisofttech.onlinechess.models.Game;
+import com.sisofttech.onlinechess.models.Player;
+import com.sisofttech.onlinechess.repositories.GameRepository;
+import com.sisofttech.onlinechess.repositories.PlayerRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;

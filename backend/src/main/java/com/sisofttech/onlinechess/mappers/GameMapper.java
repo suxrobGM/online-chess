@@ -1,7 +1,7 @@
 package com.sisofttech.onlinechess.mappers;
 
 import com.sisofttech.onlinechess.dto.GameDto;
-import com.sisofttech.onlinechess.model.Game;
+import com.sisofttech.onlinechess.models.Game;
 
 public class GameMapper {
     public static GameDto toDto(Game game) {
