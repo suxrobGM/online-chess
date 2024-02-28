@@ -53,7 +53,7 @@ public final class MoveUtils {
      * @param moves list of moves
      * @return ambiguous move
      */
-    public String getDisambiguator(InternalMove move, List<InternalMove> moves) {
+    public static String getDisambiguator(InternalMove move, List<InternalMove> moves) {
         var from = move.getFrom();
         var to = move.getTo();
         var piece = move.getPiece();
@@ -116,7 +116,7 @@ public final class MoveUtils {
      * @param captured captured piece
      * @param flags move flags
      */
-    public void addMove(
+    public static void addMove(
         List<InternalMove> moves,
         char color,
         int from,
@@ -130,14 +130,14 @@ public final class MoveUtils {
 
         if (piece == PieceSymbols.PAWN && (rank == Ranks.RANK_1 || rank == Ranks.RANK_8)) {
             for (var promotion : ChessConstants.PROMOTIONS) {
-                moves.add(new InternalMove(color, from, to, piece, captured, promotion, flags | Flags.PROMOTION.item2()));
+                moves.add(new InternalMove(color, from, to, piece, captured, promotion, flags | Bits.PROMOTION));
             }
         } else {
             moves.add(new InternalMove(color, from, to, piece, captured, PieceSymbols.EMPTY, flags));
         }
     }
 
-    public char inferPieceType(String san) {
+    public static char inferPieceType(String san) {
         var pieceType = san.charAt(0);
 
         if (pieceType >= 'a' && pieceType <= 'h') {
@@ -160,7 +160,7 @@ public final class MoveUtils {
      * @param move SAN
      * @return stripped SAN
      */
-    public String strippedSan(String move) {
+    public static String strippedSan(String move) {
         return move.replace("=", "").replaceAll("[+#]?[?!]*$", "");
     }
 
@@ -170,8 +170,7 @@ public final class MoveUtils {
      * @param fen FEN
      * @return trimmed FEN
      */
-    public String trimFen(String fen) {
-
+    public static String trimFen(String fen) {
         var parts = fen.split(" ");
         return Arrays.stream(parts).limit(4).collect(Collectors.joining(" "));
     }

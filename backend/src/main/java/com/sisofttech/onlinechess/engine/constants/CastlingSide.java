@@ -1,8 +1,8 @@
 package com.sisofttech.onlinechess.engine.constants;
 
 public final class CastlingSide {
-    public static final int KINGSIDE = Flags.KSIDE_CASTLE.item2();
-    public static final int QUEENSIDE = Flags.QSIDE_CASTLE.item2();
+    public static final int KINGSIDE = Bits.KSIDE_CASTLE;
+    public static final int QUEENSIDE = Bits.QSIDE_CASTLE;
 
     public static final int K = KINGSIDE; // Alias
     public static final int Q = QUEENSIDE;

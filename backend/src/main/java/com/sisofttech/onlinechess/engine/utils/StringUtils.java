@@ -28,4 +28,8 @@ public final class StringUtils {
         }
         return count;
     }
+
+    public static boolean hasDigit(String str) {
+        return str.chars().anyMatch(Character::isDigit);
+    }
 }

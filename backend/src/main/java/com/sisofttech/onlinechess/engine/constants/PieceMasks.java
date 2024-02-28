@@ -14,4 +14,22 @@ public final class PieceMasks {
     public static final int R = ROOK;
     public static final int Q = QUEEN;
     public static final int K = KING;
+
+    /**
+     * Get the piece mask for the given piece symbol.
+     *
+     * @param pieceSymbol The piece symbol.
+     * @return The piece mask.
+     */
+    public static int get(char pieceSymbol) {
+        return switch (pieceSymbol) {
+            case 'p' -> PAWN;
+            case 'n' -> KNIGHT;
+            case 'b' -> BISHOP;
+            case 'r' -> ROOK;
+            case 'q' -> QUEEN;
+            case 'k' -> KING;
+            default -> -1;
+        };
+    }
 }

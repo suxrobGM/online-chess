@@ -11,5 +11,9 @@ public final class Ranks {
     public static final int RANK_8 = 0;
 
     public static final int SECOND_RANK_WHITE = RANK_2;
-    public static final int SEVENTH_RANK_BLACK = RANK_7;
+    public static final int SECOND_RANK_BLACK = RANK_7;
+
+    public static int getSecondRank(char color) {
+        return color == PieceColors.WHITE ? SECOND_RANK_WHITE : SECOND_RANK_BLACK;
+    }
 }

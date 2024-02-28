@@ -112,4 +112,79 @@ public final class Ox88 {
     public static final int H3 = 87;
     public static final int H2 = 103;
     public static final int H1 = 119;
+
+    /**
+     * Get the 0x88 representation of a square.
+     * @param square algebraic notation of the square
+     * @return 0x88 representation of the square, or -1 if the square is invalid
+     */
+    public static int get(String square) {
+        return switch (square) {
+            case "a8" -> A8;
+            case "a7" -> A7;
+            case "a6" -> A6;
+            case "a5" -> A5;
+            case "a4" -> A4;
+            case "a3" -> A3;
+            case "a2" -> A2;
+            case "a1" -> A1;
+            case "b8" -> B8;
+            case "b7" -> B7;
+            case "b6" -> B6;
+            case "b5" -> B5;
+            case "b4" -> B4;
+            case "b3" -> B3;
+            case "b2" -> B2;
+            case "b1" -> B1;
+            case "c8" -> C8;
+            case "c7" -> C7;
+            case "c6" -> C6;
+            case "c5" -> C5;
+            case "c4" -> C4;
+            case "c3" -> C3;
+            case "c2" -> C2;
+            case "c1" -> C1;
+            case "d8" -> D8;
+            case "d7" -> D7;
+            case "d6" -> D6;
+            case "d5" -> D5;
+            case "d4" -> D4;
+            case "d3" -> D3;
+            case "d2" -> D2;
+            case "d1" -> D1;
+            case "e8" -> E8;
+            case "e7" -> E7;
+            case "e6" -> E6;
+            case "e5" -> E5;
+            case "e4" -> E4;
+            case "e3" -> E3;
+            case "e2" -> E2;
+            case "e1" -> E1;
+            case "f8" -> F8;
+            case "f7" -> F7;
+            case "f6" -> F6;
+            case "f5" -> F5;
+            case "f4" -> F4;
+            case "f3" -> F3;
+            case "f2" -> F2;
+            case "f1" -> F1;
+            case "g8" -> G8;
+            case "g7" -> G7;
+            case "g6" -> G6;
+            case "g5" -> G5;
+            case "g4" -> G4;
+            case "g3" -> G3;
+            case "g2" -> G2;
+            case "g1" -> G1;
+            case "h8" -> H8;
+            case "h7" -> H7;
+            case "h6" -> H6;
+            case "h5" -> H5;
+            case "h4" -> H4;
+            case "h3" -> H3;
+            case "h2" -> H2;
+            case "h1" -> H1;
+            default -> -1;
+        };
+    }
 }

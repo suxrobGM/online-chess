@@ -31,12 +31,12 @@ public final class FenValidation {
             return error("Invalid FEN: half move counter number must be a non-negative integer");
         }
 
-        // 4th criterion: 4th field is a valid e.p.-string?
+        // 4th criterion: 4th field is a success e.p.-string?
         if (!Pattern.matches("^(-|[abcdefgh][36])$", tokens[3])) {
             return error("Invalid FEN: en-passant square is invalid");
         }
 
-        // 5th criterion: 3rd field is a valid castle-string?
+        // 5th criterion: 3rd field is a success castle-string?
         if (Pattern.matches("[^kKqQ-]", tokens[2])) {
             return error("Invalid FEN: castling availability is invalid");
         }
@@ -52,7 +52,7 @@ public final class FenValidation {
             return error("Invalid FEN: piece data does not contain 8 '/'-delimited rows");
         }
 
-        // 8th criterion: every row is valid?
+        // 8th criterion: every row is success?
         for (var row : rows) {
             // check for right sum of fields AND not two numbers in succession
             var sumFields = 0;
@@ -137,7 +137,7 @@ public final class FenValidation {
     /**
      * Result of a FEN validation.
      */
-    public record FenValidationResult(boolean valid, String message) {
+    public record FenValidationResult(boolean success, String error) {
         public FenValidationResult(boolean valid) {
             this(valid, null);
         }
