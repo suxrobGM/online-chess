@@ -2,7 +2,7 @@ package com.sisofttech.onlinechess.engine;
 
 public class Piece {
     private final char color;
-    private final char type;
+    private char type;
 
     public Piece(char color, char type) {
         this.color = color;
@@ -15,5 +15,9 @@ public class Piece {
 
     public char getType() {
         return type;
+    }
+
+    public void setType(char type) {
+        this.type = type;
     }
 }

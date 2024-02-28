@@ -1,15 +1,33 @@
 package com.sisofttech.onlinechess.engine;
 
-import com.sisofttech.onlinechess.engine.constants.PieceColors;
-
 public class InternalMove {
     private char color;
     private int from;
     private int to;
     private char piece;
-    private char captured;
-    private char promotion;
+    private Character captured; // Nullable
+    private Character promotion; // Nullable
     private int flags;
+
+    public InternalMove(char color, int from, int to, char piece, int flags) {
+        this.color = color;
+        this.from = from;
+        this.to = to;
+        this.piece = piece;
+        this.flags = flags;
+        captured = null;
+        promotion = null;
+    }
+
+    public InternalMove(char color, int from, int to, char piece, char captured, int flags) {
+        this.color = color;
+        this.from = from;
+        this.to = to;
+        this.piece = piece;
+        this.captured = captured;
+        this.flags = flags;
+        promotion = null;
+    }
 
     public InternalMove(char color, int from, int to, char piece, char captured, char promotion, int flags) {
         this.color = color;
@@ -54,19 +72,19 @@ public class InternalMove {
         this.piece = piece;
     }
 
-    public char getCaptured() {
+    public Character getCaptured() {
         return captured;
     }
 
-    public void setCaptured(char captured) {
+    public void setCaptured(Character captured) {
         this.captured = captured;
     }
 
-    public char getPromotion() {
+    public Character getPromotion() {
         return promotion;
     }
 
-    public void setPromotion(char promotion) {
+    public void setPromotion(Character promotion) {
         this.promotion = promotion;
     }
 

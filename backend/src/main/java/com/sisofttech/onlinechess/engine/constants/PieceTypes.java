@@ -3,8 +3,7 @@ package com.sisofttech.onlinechess.engine.constants;
 /**
  * Piece symbol constants.
  */
-public final class PieceSymbols {
-    public static final char EMPTY = Character.MIN_VALUE;
+public final class PieceTypes {
     public static final char PAWN = 'p';
     public static final char KNIGHT = 'n';
     public static final char BISHOP = 'b';

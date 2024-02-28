@@ -1,20 +1,31 @@
 package com.sisofttech.onlinechess.engine;
 
-import com.sisofttech.onlinechess.engine.constants.PieceColors;
-import com.sisofttech.onlinechess.engine.constants.PieceSymbols;
-
 public class Move {
     private char color;
     private String from;
     private String to;
     private char piece;
-    private char captured; // nullable
-    private char promotion; // nullable
+    private Character captured; // nullable
+    private Character promotion; // nullable
     private String flags;
     private String san;
     private String lan;
     private String before;
     private String after;
+
+    public Move(char color, String from, String to, char piece, String flags) {
+        this.color = color;
+        this.from = from;
+        this.to = to;
+        this.piece = piece;
+        this.flags = flags;
+        captured = null;
+        promotion = null;
+        san = null;
+        lan = null;
+        before = null;
+        after = null;
+    }
 
     public char getColor() {
         return color;
@@ -48,19 +59,19 @@ public class Move {
         this.piece = piece;
     }
 
-    public char getCaptured() {
+    public Character getCaptured() {
         return captured;
     }
 
-    public void setCaptured(char captured) {
+    public void setCaptured(Character captured) {
         this.captured = captured;
     }
 
-    public char getPromotion() {
+    public Character getPromotion() {
         return promotion;
     }
 
-    public void setPromotion(char promotion) {
+    public void setPromotion(Character promotion) {
         this.promotion = promotion;
     }
 

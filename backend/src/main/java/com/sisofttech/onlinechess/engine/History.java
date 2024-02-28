@@ -1,18 +1,34 @@
 package com.sisofttech.onlinechess.engine;
 
-import com.sisofttech.onlinechess.engine.constants.PieceColors;
-
 import java.util.Map;
 
 public class History {
     private InternalMove move;
-    private Map<PieceColors, Integer> kings;
-    private PieceColors turn;
-    private Map<PieceColors, Integer> castling;
+    private Map<Character, Integer> kings;
+    private char turn;
+    private Map<Character, Integer> castling;
     private int epSquare;
     private int halfMoves;
     private int moveNumber;
 
+    public History(
+        InternalMove move,
+        Map<Character, Integer> kings,
+        char turn,
+        Map<Character, Integer> castling,
+        int epSquare,
+        int halfMoves,
+        int moveNumber
+    )
+    {
+        this.move = move;
+        this.kings = kings;
+        this.turn = turn;
+        this.castling = castling;
+        this.epSquare = epSquare;
+        this.halfMoves = halfMoves;
+        this.moveNumber = moveNumber;
+    }
 
     public InternalMove getMove() {
         return move;
@@ -22,27 +38,27 @@ public class History {
         this.move = move;
     }
 
-    public Map<PieceColors, Integer> getKings() {
+    public Map<Character, Integer> getKings() {
         return kings;
     }
 
-    public void setKings(Map<PieceColors, Integer> kings) {
+    public void setKings(Map<Character, Integer> kings) {
         this.kings = kings;
     }
 
-    public PieceColors getTurn() {
+    public char getTurn() {
         return turn;
     }
 
-    public void setTurn(PieceColors turn) {
+    public void setTurn(Character turn) {
         this.turn = turn;
     }
 
-    public Map<PieceColors, Integer> getCastling() {
+    public Map<Character, Integer> getCastling() {
         return castling;
     }
 
-    public void setCastling(Map<PieceColors, Integer> castling) {
+    public void setCastling(Map<Character, Integer> castling) {
         this.castling = castling;
     }
 

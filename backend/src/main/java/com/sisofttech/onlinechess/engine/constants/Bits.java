@@ -9,7 +9,7 @@ public final class Bits {
     public static final int KSIDE_CASTLE = 32;
     public static final int QSIDE_CASTLE = 64;
 
-    public static char getBitName(int bit) {
+    public static char getBitSymbol(int bit) {
         return switch (bit) {
             case NORMAL -> 'n';
             case CAPTURE -> 'c';
@@ -19,6 +19,18 @@ public final class Bits {
             case KSIDE_CASTLE -> 'k';
             case QSIDE_CASTLE -> 'q';
             default -> throw new IllegalArgumentException("Invalid bit");
+        };
+    }
+
+    public static int[] getBits() {
+        return new int[] {
+            NORMAL,
+            CAPTURE,
+            BIG_PAWN,
+            EP_CAPTURE,
+            PROMOTION,
+            KSIDE_CASTLE,
+            QSIDE_CASTLE
         };
     }
 

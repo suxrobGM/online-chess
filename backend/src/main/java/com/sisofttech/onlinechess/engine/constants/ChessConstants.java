@@ -52,10 +52,10 @@ public final class ChessConstants {
     };
 
     public static final char[] PROMOTIONS = {
-        PieceSymbols.KNIGHT,
-        PieceSymbols.BISHOP,
-        PieceSymbols.ROOK,
-        PieceSymbols.QUEEN,
+        PieceTypes.KNIGHT,
+        PieceTypes.BISHOP,
+        PieceTypes.ROOK,
+        PieceTypes.QUEEN,
     };
 
     public static final String[] TERMINATION_MARKERS = {
