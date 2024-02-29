@@ -7,9 +7,19 @@ public final class PieceOffsets {
     public static final int[] QUEEN = {-17, -16, -15, 1, 17, 16, 15, -1};
     public static final int[] KING = {-17, -16, -15, 1, 17, 16, 15, -1};
 
-    public static final int[] N = KNIGHT; // Alias
-    public static final int[] B = BISHOP;
-    public static final int[] R = ROOK;
-    public static final int[] Q = QUEEN;
-    public static final int[] K = KING;
+    /**
+     * Get the piece offsets for the given piece type.
+     * @param pieceType The piece type (symbol).
+     * @return The piece offsets, or null if the piece type is invalid.
+     */
+    public static int[] get(char pieceType) {
+        return switch (pieceType) {
+            case 'n' -> KNIGHT;
+            case 'b' -> BISHOP;
+            case 'r' -> ROOK;
+            case 'q' -> QUEEN;
+            case 'k' -> KING;
+            default -> null;
+        };
+    }
 }

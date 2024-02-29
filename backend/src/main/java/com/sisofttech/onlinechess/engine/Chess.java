@@ -4,13 +4,16 @@ import com.sisofttech.onlinechess.engine.constants.*;
 import com.sisofttech.onlinechess.engine.options.MoveOptions;
 import com.sisofttech.onlinechess.engine.options.MovesOptions;
 import com.sisofttech.onlinechess.engine.utils.ArrayUtils;
+import com.sisofttech.onlinechess.engine.utils.EncodingUtils;
+import com.sisofttech.onlinechess.engine.utils.StringUtils;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.IntPredicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static com.sisofttech.onlinechess.engine.constants.CastlingSides.ROOKS;
+import static com.sisofttech.onlinechess.engine.constants.Bits.ROOKS;
 
 public class Chess {
     public static final String DEFAULT_POSITION = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
@@ -19,7 +22,7 @@ public class Chess {
     private final Map<String, String> headers = new HashMap<>();
     private Map<Character, Integer> kings = new HashMap<>();
     private Map<Character, Integer> castling = new HashMap<>();
-    private final Map<String, String> comments = new HashMap<>();
+    private Map<String, String> comments = new HashMap<>();
 
     /**
      * Tracks number of times a position has been seen for repetition checking
@@ -31,12 +34,20 @@ public class Chess {
     private int halfMoves = 0;
     private int moveNumber = 1;
 
+    public Chess() {
+        this.load(DEFAULT_POSITION, false, false);
+    }
+
     public Chess(String fen) {
         this.load(fen, false, false);
         kings.put(PieceColors.WHITE, EMPTY);
         kings.put(PieceColors.BLACK, EMPTY);
         castling.put(PieceColors.WHITE, 0);
         castling.put(PieceColors.BLACK, 0);
+    }
+
+    public int getMoveNumber() {
+        return moveNumber;
     }
 
     public void clear() {
@@ -70,6 +81,10 @@ public class Chess {
 
     public void removeHeader(String key) {
         headers.remove(key);
+    }
+
+    public void load(String fen) {
+        load(fen, false, false);
     }
 
     public void load(String fen, boolean skipValidation, boolean preserveHeaders) {
@@ -389,11 +404,11 @@ public class Chess {
     }
 
     public boolean isCheckmate() {
-        return isCheck() && moves().isEmpty();
+        return isCheck() && generateMovesInternal(new MovesOptions()).isEmpty();
     }
 
     public boolean isStalemate() {
-        return !isCheck() && moves().isEmpty();
+        return !isCheck() && generateMovesInternal(new MovesOptions()).isEmpty();
     }
 
     public boolean isInsufficientMaterial() {
@@ -436,10 +451,12 @@ public class Chess {
         // k vs. k
         if (numPieces == 2) {
             return true;
-        } else if (numPieces == 3 && (pieces.get(PieceTypes.BISHOP) == 1 || pieces.get(PieceTypes.KNIGHT) == 1)) {
+        }
+        else if (numPieces == 3 && (pieces.get(PieceTypes.BISHOP) == 1 || pieces.get(PieceTypes.KNIGHT) == 1)) {
             // k vs. kn .... or .... k vs. kb
             return true;
-        } else if (numPieces == pieces.get(PieceTypes.BISHOP) + 2) {
+        }
+        else if (numPieces == pieces.get(PieceTypes.BISHOP) + 2) {
             // kb vs. kb where any number of bishops are all on the same color
             var sum = 0;
             for (var bishop : bishops) {
@@ -466,21 +483,17 @@ public class Chess {
         return isCheckmate() || isStalemate() || isDraw();
     }
 
-    public List<String> moves() {
-        return this.moves(new MovesOptions());
+    public Move[] generateMoves() {
+        var moves = this.generateMovesInternal(new MovesOptions(true, false));
+        return moves.stream().map(this::makePretty).toArray(Move[]::new);
     }
 
-    public List<String> moves(MovesOptions options) {
-        List<InternalMove> moves = this.movesInternal(options);
-
-        if (options.verbose) {
-            return moves.stream().map(makePretty).collect(Collectors.toList());
-        } else {
-            return moves.stream().map(move -> moveToSan(move, moves)).collect(Collectors.toList());
-        }
+    public String[] generateMovesAsSan() {
+        var moves = generateMovesInternal(new MovesOptions());
+        return moves.stream().map(move -> moveToSan(move, moves)).toArray(String[]::new);
     }
 
-    private List<InternalMove> movesInternal(MovesOptions options) {
+    private List<InternalMove> generateMovesInternal(MovesOptions options) {
         var forSquare = options.square.map(String::toLowerCase).orElse(null);
         var forPiece = options.piece.orElse(null);
 
@@ -525,7 +538,7 @@ public class Chess {
                 // single square, non-capturing
                 to = from + PawnOffsets.get(us)[0];
                 if (board[to] == null) {
-                    addMove(moves, us, from, to, PieceTypes.PAWN, null, 0
+                    addMove(moves, us, from, to, PieceTypes.PAWN, null, 0);
 
                     // double square
                     to = from + PawnOffsets.get(us)[1];
@@ -550,8 +563,8 @@ public class Chess {
                     }
                 }
             } else {
-                for (var j = 0; j < PawnOffsets.get(type).length; j++) {
-                    var offset = PawnOffsets.get(type)[j];
+                for (var j = 0; j < PieceOffsets.get(type).length; j++) {
+                    var offset = PieceOffsets.get(type)[j];
                     to = from;
 
                     while (true) {
@@ -763,10 +776,10 @@ public class Chess {
         InternalMove moveObj = null;
 
         if (options.san.isPresent()) {
-            moveObj = moveFromSan(options.san, options.strict);
+            moveObj = moveFromSan(options.san.get(), options.strict);
         }
         else if (options.from.isPresent() && options.to.isPresent()) {
-            var moves = this.movesInternal(new MovesOptions());
+            var moves = this.generateMovesInternal(new MovesOptions());
 
             // convert the pretty move object to an ugly move object
             for (var m : moves) {
@@ -813,6 +826,636 @@ public class Chess {
             return prettyMove;
         }
         return null;
+    }
+
+    public String pgn() {
+        return pgn("\n", 0);
+    }
+
+    public String pgn(String newline, int maxWidth) {
+        var result = new ArrayList<String>();
+        var headerExists = false;
+
+        /* add the PGN header information */
+        for (var entry : headers.entrySet()) {
+            result.add("[" + entry.getKey() + " \"" + entry.getValue() + "\"]" + newline);
+            headerExists = true;
+        }
+
+        if (headerExists && !history.isEmpty()) {
+            result.add(newline);
+        }
+
+        // pop all history onto reversed_history
+        var reversedHistory = new Stack<InternalMove>();
+        while (!history.isEmpty()) {
+            reversedHistory.push(undoMove());
+        }
+
+        var moves = new ArrayList<String>();
+        var moveString = "";
+
+        // special case of a commented starting position with no moves
+        if (reversedHistory.isEmpty()) {
+            moves.add(appendComment(""));
+        }
+
+        // build the list of moves.  a move_string looks like: "3. e3 e6"
+        while (!reversedHistory.isEmpty()) {
+            moveString = appendComment(moveString);
+            var move = reversedHistory.pop();
+
+            // if the position started with black to move, start PGN with #. ...
+            if (history.isEmpty() && move.getColor() == PieceColors.BLACK) {
+                var prefix = moveNumber + ". ...";
+
+                // is there a comment preceding the first move?
+                moveString = moveString.isEmpty() ? prefix : moveString + " " + prefix;
+            }
+            else if (move.getColor() == PieceColors.WHITE) {
+                // store the previous generated move_string if we have one
+                if (!moveString.isEmpty()) {
+                    moves.add(moveString);
+                }
+                moveString = moveNumber + ".";
+            }
+
+            moveString = moveString + " " + moveToSan(move, generateMovesInternal(new MovesOptions(true)));
+            makeMove(move);
+        }
+
+        // are there any other leftover moves?
+        if (!moveString.isEmpty()) {
+            moves.add(appendComment(moveString));
+        }
+
+        // is there a result?
+        if (headers.containsKey("Result")) {
+            moves.add(headers.get("Result"));
+        }
+
+        // history should be back to what it was before we started generating PGN,
+        // so join together moves
+        if (maxWidth == 0) {
+            return String.join("", result) + String.join(" ", moves);
+        }
+
+        // wrap the PGN output at max_width
+        var currentWidth = 0;
+        for (var i = 0; i < moves.size(); i++) {
+            if (currentWidth + moves.get(i).length() > maxWidth) {
+                if (moves.get(i).contains("{")) {
+                    currentWidth = wrapComment(currentWidth, moves.get(i), result, newline, maxWidth);
+                    continue;
+                }
+            }
+
+            // if the current move will push past max_width
+            if (currentWidth + moves.get(i).length() > maxWidth && i != 0) {
+                // don't end the line with whitespace
+                if (result.getLast().equals(" ")) {
+                    result.removeLast();
+                }
+
+                result.add(newline);
+                currentWidth = 0;
+            }
+            else if (i != 0) {
+                result.add(" ");
+                currentWidth++;
+            }
+
+            result.add(moves.get(i));
+            currentWidth += moves.get(i).length();
+        }
+
+        return String.join("", result);
+    }
+
+    public void loadPgn(String pgn, boolean strict, String newline) {
+        newline = newline == null ? "\\r?\\n" : newline;
+        var maskedNewline = newline.replace("\\", "\\\\");
+
+        // strip whitespace from head/tail of PGN block
+        pgn = pgn.trim();
+
+        var headerRegex = "^(\\[((?:" +
+                maskedNewline +
+                ")|.)*])((?:\\s*" +
+                maskedNewline +
+                "){2}|(?:\\s*" +
+                maskedNewline +
+                ")*$)";
+        var pattern = Pattern.compile(headerRegex);
+        var matcher = pattern.matcher(pgn);
+
+        var headerString = "";
+        if (matcher.find()) {
+            headerString = matcher.group(1);
+        }
+
+        // Put the board in the starting position
+        this.reset();
+
+        // parse PGN header
+        var headers = parsePgnHeader(headerString, maskedNewline);
+        var fen = "";
+
+        for (var key : headers.keySet()) {
+            // check to see user is including fen (possibly with wrong tag case)
+            if (key.equalsIgnoreCase("fen")) {
+                fen = headers.get(key);
+            }
+            headers.put(key, headers.get(key));
+        }
+
+        /*
+         * the permissive parser should attempt to load a fen tag, even if it's the
+         * wrong case and doesn't include a corresponding [SetUp "1"] tag
+         */
+        if (!strict) {
+            if (!StringUtils.isNullOrEmpty(fen)) {
+                this.load(fen, false, true);
+            }
+        }
+        else {
+            /*
+             * strict parser - load the starting position indicated by [Setup '1']
+             * and [FEN position]
+             */
+            if (headers.get("SetUp") != null && headers.get("SetUp").equals("1")) {
+                if (!headers.containsKey("FEN")) {
+                    throw new IllegalStateException("Invalid PGN: FEN tag must be supplied with SetUp tag");
+                }
+
+                // don't clear the headers when loading
+                this.load(headers.get("FEN"), false, true);
+            }
+        }
+
+        // delete header to get the moves
+        var ms = pgn.replace(headerString, "");
+
+        // Encode comments so they don't get deleted
+        ms = encodePgnComment(ms, maskedNewline);
+
+        // Replace newline characters with spaces
+        ms = ms.replaceAll(maskedNewline, " ");
+
+        // delete recursive annotation variations
+        var ravRegex = Pattern.compile("(\\([^()]+\\))+?");
+        while (ravRegex.matcher(ms).find()) {
+            ms = ms.replaceAll(ravRegex.pattern(), "");
+        }
+
+        // delete move numbers
+        ms = ms.replaceAll("\\d+\\.\\.\\.", "");
+
+        // delete ... indicating black to move
+        ms = ms.replaceAll("\\.\\.\\.", "");
+
+        /* delete numeric annotation glyphs */
+        ms = ms.replaceAll("\\$\\d+", "");
+
+        // trim and get array of moves
+        var moves = ms.trim().split("\\s+");
+
+        // delete empty entries
+        moves = Arrays.stream(moves).filter(move -> !move.isEmpty()).toArray(String[]::new);
+
+        var result = "";
+
+        for (int halfMove = 0; halfMove < moves.length; halfMove++) {
+            var comment = EncodingUtils.decodeComment(moves[halfMove]);
+
+            if (!StringUtils.isNullOrEmpty(comment)) {
+                this.comments.put(this.fen(), comment);
+                continue;
+            }
+
+            var move = this.moveFromSan(moves[halfMove], strict);
+
+            // invalid move
+            if (move == null) {
+                // was the move an end of game marker
+                if (ArrayUtils.contains(ChessConstants.TERMINATION_MARKERS, moves[halfMove])) {
+                    result = moves[halfMove];
+                }
+                else {
+                    throw new IllegalStateException("Invalid move in PGN: " + moves[halfMove]);
+                }
+            }
+            else {
+                // reset the end of game marker if making a valid move
+                result = "";
+                makeMove(move);
+                incPositionCount(fen());
+            }
+        }
+
+        /*
+         * Per section 8.2.6 of the PGN spec, the Result tag pair must match
+         * the termination marker. Only do this when headers are present, but the
+         * result tag is missing
+         */
+        if (result != null && !headers.isEmpty() && !headers.containsKey("Result")) {
+            headers.put("Result", result);
+        }
+    }
+
+    private Map<String, String> parsePgnHeader(String headerStr, String newline) {
+        var headersMap = new HashMap<String, String>();
+        var headersArr = headerStr.split(newline);
+        var key = "";
+        var value = "";
+        var regex = Pattern.compile("^\\s*\\[\\s*([A-Za-z]+)\\s*\"(.*)\"\\s*\\]\\s*$");
+
+        for (var header : headersArr) {
+            var matcher = regex.matcher(header);
+
+            if (matcher.find()) {
+                key = matcher.group(1);
+                value = matcher.group(2);
+
+                if (!key.trim().isEmpty()) {
+                    headersMap.put(key, value);
+                }
+            }
+        }
+
+        return headersMap;
+    }
+
+    private String encodePgnComment(String comment, String newline) {
+        var commentPattern = Pattern.compile("({[^}]*})+?|;([^" + newline + "]*)");
+        var commentMatcher = commentPattern.matcher(comment);
+        var sb = new StringBuilder();
+
+        while (commentMatcher.find()) {
+            if (commentMatcher.group(1) != null) {
+                // Bracketed comment
+                commentMatcher.appendReplacement(sb, EncodingUtils.encodeComment(commentMatcher.group(1), newline));
+            }
+            else if (commentMatcher.group(2) != null) {
+                // Semicolon comment
+                commentMatcher.appendReplacement(sb, " " + EncodingUtils.encodeComment("{" + commentMatcher.group(2).substring(1) + "}", newline));
+            }
+        }
+
+        commentMatcher.appendTail(sb);
+        return sb.toString();
+    }
+
+    /*
+     * Convert a move from 0x88 coordinates to Standard Algebraic Notation (SAN)
+     */
+    private String moveToSan(InternalMove move, List<InternalMove> moves) {
+        var output = new StringBuilder();
+
+        if ((move.getFlags() & Bits.KSIDE_CASTLE) != 0) {
+            output.append("O-O");
+        }
+        else if ((move.getFlags() & Bits.QSIDE_CASTLE) != 0) {
+            output.append("O-O-O");
+        }
+        else {
+            if (move.getPiece() != PieceTypes.PAWN) {
+                var disambiguator = getDisambiguator(move, moves);
+                output.append(Character.toUpperCase(move.getPiece())).append(disambiguator);
+            }
+
+            if ((move.getFlags() & (Bits.CAPTURE | Bits.EP_CAPTURE)) != 0) {
+                if (move.getPiece() == PieceTypes.PAWN) {
+                    output.append(algebraic(move.getFrom()).charAt(0));
+                }
+                output.append("x");
+            }
+
+            output.append(algebraic(move.getTo()));
+
+            if (move.getPromotion() != null) {
+                output.append("=").append(Character.toUpperCase(move.getPromotion()));
+            }
+        }
+
+        makeMove(move);
+        if (this.isCheck()) {
+            if (this.isCheckmate()) {
+                output.append("#");
+            }
+            else {
+                output.append("+");
+            }
+        }
+        undoMove();
+
+        return output.toString();
+    }
+
+    /**
+     * Converts a move from Standard Algebraic Notation (SAN) to 0x88 coordinates
+     * @param move SAN move
+     * @param strict strict parser
+     * @return 0x88 move
+     */
+    private InternalMove moveFromSan(String move, boolean strict) {
+        // strip off any move decorations: e.g Nf3+?! becomes Nf3
+        var cleanMove = strippedSan(move);
+        var pieceType = inferPieceType(cleanMove);
+        var moves = generateMovesInternal(new MovesOptions(true, pieceType));
+
+        // strict parser
+        for (var moveItem : moves) {
+            if (cleanMove.equals(strippedSan(moveToSan(moveItem, moves)))) {
+                return moveItem;
+            }
+        }
+
+        // the strict parser failed
+        if (strict) {
+            return null;
+        }
+
+        String from = null;
+        String to = null;
+        Character piece = null;
+        Character promotion = null;
+
+        /*
+         * The default permissive (non-strict) parser allows the user to parse
+         * non-standard chess notations. This parser is only run after the strict
+         * Standard Algebraic Notation (SAN) parser has failed.
+         *
+         * When running the permissive parser, we'll run a regex to grab the piece, the
+         * to/from square, and an optional promotion piece. This regex will
+         * parse common non-standard notation like: Pe2-e4, Rc1c4, Qf3xf7,
+         * f7f8q, b1c3
+         *
+         * NOTE: Some positions and moves may be ambiguous when using the permissive
+         * parser. For example, in this position: 6k1/8/8/B7/8/8/8/BN4K1 w - - 0 1,
+         * the move b1c3 may be interpreted as Nc3 or B1c3 (a disambiguated bishop
+         * move). In these cases, the permissive parser will default to the most
+         * basic interpretation (which is b1c3 parsing to Nc3).
+         */
+        var overlyDisambiguated = false;
+
+        // Pattern format: {piece} {from} {to} {promotion}
+        var matcher = Pattern.compile("([pnbrqkPNBRQK])?([a-h][1-8])x?-?([a-h][1-8])([qrbnQRBN])?").matcher(cleanMove);
+
+        if (matcher.matches()) {
+            piece = matcher.group(1).charAt(0);
+            from = matcher.group(2);
+            to = matcher.group(3);
+            promotion = matcher.group(4).charAt(0);
+
+            if (from.length() == 1) {
+                overlyDisambiguated = true;
+            }
+        }
+        else {
+            /*
+             * The [a-h]?[1-8]? portion of the regex below handles moves that may be
+             * overly disambiguated (e.g. Nge7 is unnecessary and non-standard when
+             * there is one legal knight move to e7). In this case, the value of
+             * 'from' variable will be a rank or file, not a square.
+             */
+            matcher = Pattern.compile("([pnbrqkPNBRQK])?([a-h]?[1-8]?)x?-?([a-h][1-8])([qrbnQRBN])?").matcher(cleanMove);
+
+            if (matcher.matches()) {
+                piece = matcher.group(1).charAt(0);
+                from = matcher.group(2);
+                to = matcher.group(3);
+                promotion = matcher.group(4).charAt(0);
+
+                if (from.length() == 1) {
+                    overlyDisambiguated = true;
+                }
+            }
+        }
+
+        pieceType = inferPieceType(cleanMove);
+        moves = generateMovesInternal(new MovesOptions(false, piece != null ? piece : pieceType));
+
+        if (to == null) {
+            return null;
+        }
+
+        for (var moveItem : moves) {
+            if (from == null) {
+                // if there is no from square, it could be just 'x' missing from a capture
+                if (cleanMove.equals(strippedSan(moveToSan(moveItem, moves)).replace("x", ""))) {
+                    return moveItem;
+                }
+            }
+            else if (
+                    (piece == null || Character.toLowerCase(piece) == moveItem.getPiece()) &&
+                            Ox88.get(from) == moveItem.getFrom() &&
+                            Ox88.get(to) == moveItem.getTo() &&
+                            (promotion == null || Character.toLowerCase(promotion) == moveItem.getPromotion())
+            )
+            {
+                // hand-compare move properties with the results from our permissive regex
+                return moveItem;
+            }
+            else if (overlyDisambiguated) {
+                // SPECIAL CASE: we parsed a move string that may have an unneeded
+                // rank/file disambiguator (e.g. Nge7).  The 'from' variable will
+                var square = algebraic(moveItem.getFrom());
+                if (
+                        (piece == null || Character.toLowerCase(piece) == moveItem.getPiece()) &&
+                                Ox88.get(to) == moveItem.getTo() &&
+                                (from.equals(square.substring(0, 1)) || from.equals(square.substring(1))) &&
+                                (promotion == null || Character.toLowerCase(promotion) == moveItem.getPromotion())
+                )
+                {
+                    return moveItem;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public String ascii() {
+        var strBuilder = new StringBuilder("   +------------------------+\n");
+        for (int i = Ox88.A8; i <= Ox88.H1; i++) {
+            if (file(i) == 0) {
+                strBuilder.append(' ')
+                        .append("87654321".charAt(rank(i)))
+                        .append(" |");
+            }
+
+            if (board[i] != null) {
+                var piece = this.board[i].getType();
+                var color = this.board[i].getColor();
+                var symbol = color == PieceColors.WHITE ? Character.toUpperCase(piece) : Character.toLowerCase(piece);
+
+                strBuilder.append(' ')
+                        .append(symbol)
+                        .append(' ');
+            }
+            else {
+                strBuilder.append(" . ");
+            }
+
+            if (((i + 1) & 0x88) != 0) {
+                strBuilder.append("|\n");
+                i += 8;
+            }
+        }
+
+        strBuilder.append("   +------------------------+\n");
+        strBuilder.append("     a  b  c  d  e  f  g  h");
+
+        return strBuilder.toString();
+    }
+
+    public int perft(int depth) {
+        var moves = generateMovesInternal(new MovesOptions(true));
+        var nodes = 0;
+        var color = this.turn;
+
+        for (var move : moves) {
+            makeMove(move);
+
+            if (!isKingAttacked(color)) {
+                if (depth - 1 > 0) {
+                    nodes += perft(depth - 1);
+                }
+                else {
+                    nodes++;
+                }
+            }
+
+            undoMove();
+        }
+
+        return nodes;
+    }
+
+    public String[] historyAsStrings() {
+        return historyGeneric(move -> moveToSan(move, generateMovesInternal(new MovesOptions())), new String[0]);
+    }
+
+    public Move[] history() {
+        return historyGeneric(this::makePretty, new Move[0]);
+    }
+
+    private <T> T[] historyGeneric(Function<InternalMove, T> processor, T[] arrayType) {
+        var reversedHistory = new Stack<InternalMove>();
+        var movesHistory = new ArrayList<T>();
+
+        while (!history.isEmpty()) {
+            reversedHistory.push(undoMove());
+        }
+
+        while (!reversedHistory.isEmpty()) {
+            var move = reversedHistory.pop();
+            movesHistory.add(processor.apply(move));
+            makeMove(move);
+        }
+
+        return movesHistory.toArray(arrayType);
+    }
+
+    public String getComment() {
+        return comments.get(fen());
+    }
+
+    public void setComment(String comment) {
+        comments.put(fen(), comment.replace('{', '[').replace('}', ']'));
+    }
+
+    public String deleteComment() {
+        var comment = comments.get(fen());
+        comments.remove(fen());
+        return comment;
+    }
+
+    public FenComment[] getComments() {
+        pruneComments();
+
+        return comments.keySet()
+                .stream()
+                .map(fen -> new FenComment(fen, comments.get(fen)))
+                .toArray(FenComment[]::new);
+    }
+
+    public FenComment[] deleteComments() {
+        var commentsArray = getComments();
+        comments.clear();
+        return commentsArray;
+    }
+
+    private void pruneComments() {
+        var reversedHistory = new Stack<InternalMove>();
+        var currentComments = new HashMap<String, String>();
+
+        while (!history.isEmpty()) {
+            reversedHistory.push(undoMove());
+        }
+
+        if (comments.containsKey(fen())) {
+            currentComments.put(fen(), comments.get(fen()));
+        }
+
+        while (!reversedHistory.isEmpty()) {
+            var move = reversedHistory.pop();
+            makeMove(move);
+
+            if (comments.containsKey(fen())) {
+                currentComments.put(fen(), comments.get(fen()));
+            }
+        }
+
+        comments = currentComments;
+    }
+
+    private String appendComment(String moveString) {
+        if (comments.containsKey(moveString)) {
+            var delimiter = !moveString.isEmpty() ? " " : "";
+            moveString = moveString + delimiter + "{" + comments.get(moveString) + "}";
+        }
+
+        return moveString;
+    }
+
+    private int wrapComment(int width, String move, List<String> result, String newline, int maxWidth) {
+        for (var token : move.split(" ")) {
+            if (token.isEmpty()) {
+                continue;
+            }
+
+            if (width + token.length() > maxWidth) {
+                while (!result.isEmpty() && result.getLast().equals(" ")) {
+                    result.removeLast();
+                    width--;
+                }
+                result.add(newline);
+                width = 0;
+            }
+
+            result.add(token);
+            width += token.length();
+            result.add(" ");
+            width++;
+        }
+
+        if (!result.isEmpty() && result.getLast().equals(" ")) {
+            result.removeLast();
+            width--;
+        }
+
+        return width;
+    }
+
+    public Map<String, String> header(String... args) {
+        for (int i = 0; i < args.length; i += 2) {
+            if (args[i] != null && args[i + 1] != null) {
+                headers.put(args[i], args[i + 1]);
+            }
+        }
+        return headers;
     }
 
     private InternalMove undoMove() {
@@ -883,6 +1526,34 @@ public class Chess {
             moveNumber
         );
         history.add(historyEntry);
+    }
+
+    public boolean setCastlingRights(char color, Map<Character, Boolean> rights) {
+        var sides = new char[] {PieceTypes.KING, PieceTypes.QUEEN};
+
+        for (var side : sides) {
+            if (rights.containsKey(side)) {
+                if (rights.get(side)) {
+                    castling.put(color, castling.get(color) | Bits.getCastlingSideBit(side));
+                }
+                else {
+                    castling.put(color, castling.get(color) & ~Bits.getCastlingSideBit(side));
+                }
+            }
+        }
+
+        updateCastlingRights();
+        var result = getCastlingRights(color);
+
+        return (rights.get(PieceTypes.KING) == null || rights.get(PieceTypes.KING) == result.get(PieceTypes.KING)) &&
+                (rights.get(PieceTypes.QUEEN) == null || rights.get(PieceTypes.QUEEN) == result.get(PieceTypes.QUEEN));
+    }
+
+    public Map<Character, Boolean> getCastlingRights(char color) {
+        var result = new HashMap<Character, Boolean>();
+        result.put(PieceTypes.KING, (castling.get(color) & Bits.KSIDE_CASTLE) != 0);
+        result.put(PieceTypes.QUEEN, (castling.get(color) & Bits.QSIDE_CASTLE) != 0);
+        return result;
     }
 
     private void setCastlingBit(char color, int bitmask) {
@@ -1005,17 +1676,15 @@ public class Chess {
 
         for (var bit : Bits.getBits()) {
             if ((bit & flags) != 0) {
-                prettyFlags.append(Bits.getBitSymbol(bit));
+                prettyFlags.append(Bits.getBitFlag(bit));
             }
         }
 
         var fromAlgebraic = algebraic(from);
         var toAlgebraic = algebraic(to);
-        var movesOptions = new MovesOptions();
-        movesOptions.legal = true;
 
         var move = new Move(color, fromAlgebraic, toAlgebraic, piece, prettyFlags.toString());
-        move.setSan(moveToSan(uglyMove, moves(movesOptions)));
+        move.setSan(moveToSan(uglyMove, generateMovesInternal(new MovesOptions(true))));
         move.setLan(fromAlgebraic + toAlgebraic);
         move.setBefore(fen());
         move.setAfter("");
@@ -1036,6 +1705,17 @@ public class Chess {
         return move;
     }
 
+    /**
+     * Keeps track of position occurrence counts for the purpose of repetition
+     * checking. All three methods (`_inc`, `_dec`, and `_get`) trim the
+     * irrelevant information from the fen, initialising new positions, and
+     * removing old positions from the record if their counts are reduced to 0.
+     */
+    private int getPositionCount(String fen) {
+        var trimmedFen = trimFen(fen);
+        return positionCount.getOrDefault(trimmedFen, 0);
+    }
+
     private void incPositionCount(String fen) {
         var trimmedFen = trimFen(fen);
 
@@ -1044,6 +1724,20 @@ public class Chess {
         }
         else {
             positionCount.put(trimmedFen, 0);
+        }
+    }
+
+    private void decPositionCount(String fen) {
+        var trimmedFen = trimFen(fen);
+        if (!positionCount.containsKey(trimmedFen)) {
+            return;
+        }
+
+        if (positionCount.get(trimmedFen) == 1) {
+            positionCount.remove(trimmedFen);
+        }
+        else {
+            positionCount.put(trimmedFen, positionCount.get(trimmedFen) - 1);
         }
     }
 

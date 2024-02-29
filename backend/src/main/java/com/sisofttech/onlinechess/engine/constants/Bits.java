@@ -1,5 +1,7 @@
 package com.sisofttech.onlinechess.engine.constants;
 
+import java.util.HashMap;
+
 public final class Bits {
     public static final int NORMAL = 1;
     public static final int CAPTURE = 2;
@@ -9,8 +11,36 @@ public final class Bits {
     public static final int KSIDE_CASTLE = 32;
     public static final int QSIDE_CASTLE = 64;
 
-    public static char getBitSymbol(int bit) {
-        return switch (bit) {
+    /**
+     * Rooks that are involved in castling.
+     * <p>
+     *     The key is the color of the rooks.
+     *     The value is a list of rooks that are involved in castling.
+     *     The first element is the queenside rook and the second element is the kingside rook.
+     *     The first element is the rook on the A file and the second element is the rook on the H file.
+     * </p>
+     */
+    public static final HashMap<Character, RookSide[]> ROOKS = new HashMap<>() {{
+        put(PieceColors.WHITE, new RookSide[]{WHITE_ROOK_QSIDE_CASTLE, WHITE_ROOK_KSIDE_CASTLE});
+        put(PieceColors.BLACK, new RookSide[]{BLACK_ROOK_QSIDE_CASTLE, BLACK_ROOK_KSIDE_CASTLE});
+    }};
+
+    public static final RookSide WHITE_ROOK_QSIDE_CASTLE = new RookSide(Ox88.A1, QSIDE_CASTLE);
+    public static final RookSide WHITE_ROOK_KSIDE_CASTLE = new RookSide(Ox88.H1, KSIDE_CASTLE);
+    public static final RookSide BLACK_ROOK_QSIDE_CASTLE = new RookSide(Ox88.A8, QSIDE_CASTLE);
+    public static final RookSide BLACK_ROOK_KSIDE_CASTLE = new RookSide(Ox88.H8, KSIDE_CASTLE);
+
+    /**
+     * Returns the castling side of the given piece type.
+     * @param side The castling side, either 'k' or 'q'
+     * @return A bitmask value of the castling side
+     */
+    public static int getCastlingSideBit(char side) {
+        return side == PieceTypes.KING ? KSIDE_CASTLE : QSIDE_CASTLE;
+    }
+
+    public static char getBitFlag(int bitmask) {
+        return switch (bitmask) {
             case NORMAL -> 'n';
             case CAPTURE -> 'c';
             case BIG_PAWN -> 'b';
@@ -34,4 +64,5 @@ public final class Bits {
         };
     }
 
+    public record RookSide(int square, int flag) {}
 }

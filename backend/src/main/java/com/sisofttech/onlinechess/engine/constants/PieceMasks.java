@@ -8,13 +8,6 @@ public final class PieceMasks {
     public static final int QUEEN = 0x10;
     public static final int KING = 0x20;
 
-    public static final int P = PAWN; // Alias
-    public static final int N = KNIGHT;
-    public static final int B = BISHOP;
-    public static final int R = ROOK;
-    public static final int Q = QUEEN;
-    public static final int K = KING;
-
     /**
      * Get the piece mask for the given piece symbol.
      *

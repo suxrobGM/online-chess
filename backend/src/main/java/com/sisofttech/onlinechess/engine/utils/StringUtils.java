@@ -1,9 +1,11 @@
 package com.sisofttech.onlinechess.engine.utils;
 
 /**
- * This class contains utility methods for strings.
+ * Contains utility functions for strings.
  */
 public final class StringUtils {
+    private StringUtils() {}
+
     /**
      * Counts the number of occurrences of a substring in a string.
      * @param str string
@@ -29,6 +31,15 @@ public final class StringUtils {
         return count;
     }
 
+    public static boolean isNullOrEmpty(String str) {
+        return str == null || str.isEmpty();
+    }
+
+    /**
+     * Checks if a string contains a digit.
+     * @param str string
+     * @return true if the string contains a digit, false otherwise
+     */
     public static boolean hasDigit(String str) {
         return str.chars().anyMatch(Character::isDigit);
     }
