@@ -58,3 +58,7 @@ To set up ChessMate locally, follow these steps:
 5. Use the following local URLs to access the apps:
     - Backend API: http://localhost:8000
     - Frontend UI: http://localhost:8001
+
+
+## Roadmap
+View the [roadmap gantt chart](./docs/roadmap.pdf) file to explore implemented and planned functionalities
