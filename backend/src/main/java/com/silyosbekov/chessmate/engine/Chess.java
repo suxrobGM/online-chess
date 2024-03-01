@@ -1,3 +1,16 @@
+/*
+ * Reference:
+ * This Chess class has been ported from the popular library chess.js (https://github.com/jhlywa/chess.js),
+ * which is originally written in TypeScript and licensed under the MIT License.
+ * The conversion process involved translating all TypeScript code into Java, followed by extensive refactoring
+ * to enhance readability and maintainability, aligning with Java standards.
+ * While the original chess.js library consists of 2,400 lines of code, this Java port has been condensed to 1,900 lines (without JavaDoc comments),
+ * including JavaDoc comments and the division into separate classes for better organization.
+ *
+ * The original chess.js library is written by Jeff Hlywa (https://github.com/jhlywa)
+ * The conversion and refactoring of the code to Java is done by Sukhrob Ilyosbekov (https://github.com/suxrobgm)
+ */
+
 package com.silyosbekov.chessmate.engine;
 
 import com.silyosbekov.chessmate.engine.constants.*;

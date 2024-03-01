@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
+/**
+ * Game service class, manages chess game related such as creating a new game, inviting to the game, etc.
+ */
 @Service
 public class GameService {
     private final GameRepository gameRepository;

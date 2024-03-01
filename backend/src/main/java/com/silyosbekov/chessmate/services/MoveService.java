@@ -55,10 +55,4 @@ public class MoveService {
         move.setMoveNumber(moveNumber + 1);
         return moveRepository.save(move);
     }
-
-    // Validate move
-    public boolean validateMove(String fromPosition, String toPosition, String piece) {
-        // Implement chess rules for piece movement
-        return true;
-    }
 }

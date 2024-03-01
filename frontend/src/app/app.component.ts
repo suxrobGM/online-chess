@@ -7,10 +7,6 @@ import {ChessBoardComponent} from './shared/components';
   selector: 'app-root',
   standalone: true,
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss',
   imports: [CommonModule, RouterOutlet, ChessBoardComponent],
 })
-export class AppComponent {
-  
-  
-}
+export class AppComponent {}

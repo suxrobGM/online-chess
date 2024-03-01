@@ -4,6 +4,11 @@ import {UnauthorizedComponent} from './pages/unauthorized';
 
 export const ROUTES: Routes = [
   {
+    path: '',
+    pathMatch: 'full',
+    redirectTo: 'home',
+  },
+  {
     path: 'home',
     loadChildren: () => import('./pages/home').then(m => m.HOME_ROUTES),
   },
