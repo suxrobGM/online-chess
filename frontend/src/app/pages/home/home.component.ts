@@ -10,6 +10,6 @@ import {CommonModule} from '@angular/common';
 })
 export class HomeComponent implements OnInit {
   ngOnInit(): void {
-    
+    console.log('HomeComponent initialized');
   }
 }
