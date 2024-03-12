@@ -1,4 +1,10 @@
-import {Component, Input, ViewChild} from '@angular/core';
+import {
+  Component,
+  HostListener,
+  Input,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import {
   NgxChessBoardModule,
   NgxChessBoardView,
@@ -9,10 +15,11 @@ import {
   selector: 'app-chessboard',
   standalone: true,
   templateUrl: './chessboard.component.html',
-  styleUrl: './chessboard.component.scss',
   imports: [NgxChessBoardModule],
 })
-export class ChessboardComponent {
+export class ChessboardComponent implements OnInit {
+  public size = 500;
+  
   @ViewChild('board') 
   public boardRef!: NgxChessBoardView;
 
@@ -40,5 +47,19 @@ export class ChessboardComponent {
       blackPawnUrl: 'assets/pieces/black-pawn.png',
       blackBishopUrl: 'assets/pieces/black-bishop.png',
     };
+  }
+
+  ngOnInit() {
+    this.resizeBoard();
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize() {
+    this.resizeBoard();
+  }
+
+  private resizeBoard() {
+    const boardSize = Math.min(window.innerWidth, window.innerHeight);
+    this.size = Math.max(boardSize - 200, 200);
   }
 }
