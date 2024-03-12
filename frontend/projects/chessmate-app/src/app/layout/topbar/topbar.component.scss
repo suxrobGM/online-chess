@@ -1,0 +1,19 @@
+.search-input {
+  width: 20ch;
+  transition: width 0.5s ease;
+}
+
+.search-input.minimized {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  width: 0;
+}
+
+:host {
+  ::ng-deep .p-menubar {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}

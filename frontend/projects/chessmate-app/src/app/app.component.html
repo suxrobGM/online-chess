@@ -1,5 +1,11 @@
-<div class="d-flex">
-  <div class="p-2">
-    <router-outlet></router-outlet>
+<p-toast key="notification" position="top-right"></p-toast>
+
+<div class="vh-100 overflow-hidden">
+  <div class="vw-100">
+    <app-topbar></app-topbar>
+    
+    <div class="container pt-4">
+      <router-outlet></router-outlet>
+    </div>
   </div>
 </div>

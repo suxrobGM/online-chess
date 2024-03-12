@@ -1,1 +1,22 @@
-<p>topbar works!</p>
+<p-menubar [model]="menuItems" [baseZIndex]="10">
+  <ng-template pTemplate="start">
+    <div class="d-flex align-items-center">
+      <img src="assets/favicon.ico" alt="logo" height="40" class="me-2">
+      <h1 class="m-0">ChessMate</h1>
+    </div>
+  </ng-template>
+
+  <ng-template pTemplate="end">
+    <p-button icon="bi bi-search" [text]="true" [rounded]="true"
+      (click)="toggleSearchInputVisibility()">
+    </p-button>
+    <input #searchInput 
+      pInputText 
+      class="search-input" 
+      placeholder="Search"  
+      [ngClass]="{'minimized': !isSearchInputVisible}"
+      (focusout)="toggleSearchInputVisibility()">
+    <p-button icon="bi bi-gear" [text]="true" [rounded]="true"></p-button>
+    <p-button label="SIGN IN"></p-button>
+  </ng-template>
+</p-menubar>

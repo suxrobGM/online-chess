@@ -31,7 +31,17 @@
             "styles": [
               "projects/chessmate-app/src/styles/imports.scss",
               "projects/chessmate-app/src/styles/reboot.scss",
-              "projects/chessmate-app/src/styles/utils.scss"
+              "projects/chessmate-app/src/styles/utils.scss",
+              {
+                "input": "node_modules/primeng/resources/themes/bootstrap4-dark-purple/theme.css",
+                "bundleName": "theme-bootstrap4-dark-purple",
+                "inject": false
+              },
+              {
+                "input": "node_modules/primeng/resources/themes/bootstrap4-light-purple/theme.css",
+                "bundleName": "theme-bootstrap4-light-purple",
+                "inject": false
+              }
             ],
             "scripts": []
           },
