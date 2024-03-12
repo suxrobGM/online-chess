@@ -1,0 +1,34 @@
+/* To learn more about this file see: https://angular.io/config/tsconfig. */
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../../out-tsc/spec",
+    "types": [
+      "jasmine"
+    ],
+    "paths": {
+      "ngx-chess-board": [
+        "../../dist/ngx-chess-board"
+      ],
+      "@configs": [
+        "./src/app/configs/index"
+      ],
+      "@core/*": [
+        "./src/app/core/*"
+      ],
+      "@shared/*": [
+        "./src/app/shared/*"
+      ],
+      "@pages/*": [
+        "./src/app/pages/*"
+      ],
+      "@layout": [
+        "./src/app/layout/index"
+      ]
+    },
+  },
+  "include": [
+    "src/**/*.spec.ts",
+    "src/**/*.d.ts"
+  ]
+}

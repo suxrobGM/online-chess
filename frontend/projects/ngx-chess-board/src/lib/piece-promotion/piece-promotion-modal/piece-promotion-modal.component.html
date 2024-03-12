@@ -1,0 +1,26 @@
+<div #myModal class="container">
+    <div class="wrapper">
+        <div class="content">
+            <div class="piece-wrapper" *ngIf="pieceIconInput">
+                <div class="piece" (click)="changeSelection(1)">
+                    <img [src]="getPieceIcon('queen')" alt="Queen">
+                </div>
+                <div class="piece" (click)="changeSelection(2)">
+                    <img [src]="getPieceIcon('rook')" alt="Rook">
+                </div>
+                <div class="piece" (click)="changeSelection(3)">
+                    <img [src]="getPieceIcon('bishop')" alt="Bishop">
+                </div>
+                <div class="piece" (click)="changeSelection(4)">
+                    <img [src]="getPieceIcon('knight')" alt="Knight">
+                </div>
+            </div>
+            <div class="piece-wrapper" *ngIf="!pieceIconInput">
+                <div class="piece" (click)="changeSelection(1)">&#x265B;</div>
+                <div class="piece" (click)="changeSelection(2)">&#x265C;</div>
+                <div class="piece" (click)="changeSelection(3)">&#x265D;</div>
+                <div class="piece" (click)="changeSelection(4)">&#x265E;</div>
+            </div>
+        </div>
+    </div>
+</div>

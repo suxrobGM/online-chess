@@ -3,34 +3,35 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "online-chess-app": {
+    "chessmate-app": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
           "style": "scss"
         }
       },
-      "root": "",
-      "sourceRoot": "src",
+      "root": "projects/chessmate-app",
+      "sourceRoot": "projects/chessmate-app/src",
       "prefix": "app",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/online-chess-app",
-            "index": "src/index.html",
-            "browser": "src/main.ts",
+            "outputPath": "dist/chessmate-app",
+            "index": "projects/chessmate-app/src/index.html",
+            "browser": "projects/chessmate-app/src/main.ts",
             "polyfills": [
               "zone.js"
             ],
-            "tsConfig": "tsconfig.app.json",
+            "tsConfig": "projects/chessmate-app/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
-              "src/assets",
-              "src/assets/favicon.ico"
+              "projects/chessmate-app/src/assets"
             ],
             "styles": [
-              "src/styles/styles.scss"
+              "projects/chessmate-app/src/styles/imports.scss",
+              "projects/chessmate-app/src/styles/reboot.scss",
+              "projects/chessmate-app/src/styles/utils.scss"
             ],
             "scripts": []
           },
@@ -62,10 +63,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "online-chess-app:build:production"
+              "buildTarget": "chessmate-app:build:production"
             },
             "development": {
-              "buildTarget": "online-chess-app:build:development"
+              "buildTarget": "chessmate-app:build:development"
             }
           },
           "defaultConfiguration": "development",
@@ -76,7 +77,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "buildTarget": "online-chess-app:build"
+            "buildTarget": "chessmate-app:build"
           }
         },
         "test": {
@@ -86,35 +87,53 @@
               "zone.js",
               "zone.js/testing"
             ],
-            "tsConfig": "tsconfig.spec.json",
+            "tsConfig": "projects/chessmate-app/tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
             "assets": [
-              "src/favicon.ico",
-              "src/assets"
+              "projects/chessmate-app/src/assets"
             ],
             "styles": [
-              "node_modules/primeng/resources/themes/lara-light-blue/theme.css",
-              "node_modules/primeng/resources/primeng.min.css",
-              "src/styles.scss"
+              "projects/chessmate-app/src/styles/imports.scss",
+              "projects/chessmate-app/src/styles/reboot.scss",
+              "projects/chessmate-app/src/styles/utils.scss"
             ],
             "scripts": []
           }
-        },
-        "lint": {
-          "builder": "@angular-eslint/builder:lint",
+        }
+      }
+    },
+    "ngx-chess-board": {
+      "projectType": "library",
+      "root": "projects/ngx-chess-board",
+      "sourceRoot": "projects/ngx-chess-board/src",
+      "prefix": "ngx",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
           "options": {
-            "lintFilePatterns": [
-              "src/**/*.ts",
-              "src/**/*.html"
+            "project": "projects/ngx-chess-board/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/ngx-chess-board/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/ngx-chess-board/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "tsConfig": "projects/ngx-chess-board/tsconfig.spec.json",
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
             ]
           }
         }
       }
     }
-  },
-  "cli": {
-    "schematicCollections": [
-      "@angular-eslint/schematics"
-    ]
   }
 }

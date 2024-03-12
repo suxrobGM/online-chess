@@ -1,0 +1,12 @@
+:root {
+  --bs-link-color: var(--primary-color-text);
+  --bs-link-hover-color: var(--text-color);
+}
+
+.h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
+  color: var(--text-color);
+}
+
+body {
+  background-color: var(--surface-100);
+}

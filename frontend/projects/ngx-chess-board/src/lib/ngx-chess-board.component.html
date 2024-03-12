@@ -1,0 +1,115 @@
+<div
+    id="board"
+    [style.height.px]="engineFacade.heightAndWidth"
+    [style.width.px]="engineFacade.heightAndWidth"
+    (contextmenu)="!modal.opened && onContextMenu($event)"
+    (pointerdown)="!modal.opened && onMouseDown($event)"
+    (pointerup)="!modal.opened && onMouseUp($event)"
+    #boardRef
+>
+    <div id="drag">
+        <div
+            [cdkDragDisabled]="engineFacade.dragDisabled"
+            (cdkDragEnded)="dragEnded($event)"
+            (cdkDragMoved)="dragMoved($event)"
+            (cdkDragStarted)="dragStart($event)"
+            class="single-piece" [innerHTML]="engineFacade.pieceIconManager.isDefaultIcons() ? piece.constant.icon : ''"
+            [ngStyle]="engineFacade.pieceIconManager.isDefaultIcons() ? '' : getCustomPieceIcons(piece)"
+            [style.transform]="'translate3d(' + piece.point.col * pieceSize + 'px, ' + piece.point.row * pieceSize + 'px,0px)'"
+            [style.max-height]="pieceSize + 'px'"
+            [style.font-size]="pieceSize * 0.8 + 'px'"
+            [style.width]="pieceSize + 'px'"
+            [style.height]="pieceSize + 'px'"
+            cdkDrag
+            [style.--animation-duration]="animationDuration + 'ms'"
+            *ngFor="let piece of engineFacade.board.pieces; let i = index"
+        >
+        </div>
+        <div
+            class="board-row"
+            *ngFor="let row of engineFacade.board.board; let i = index"
+        >
+            <div
+                class="board-col"
+                [class.current-selection]="showActivePiece && engineFacade.board.isXYInActiveMove(i,j)"
+                [class.king-check]=" engineFacade.board.isKingChecked(engineFacade.board.getPieceByPoint(i,j))"
+                [class.point-circle]="engineFacade.board.isXYInPointSelection(i, j)"
+                [class.possible-capture]="showPossibleCaptures && engineFacade.board.isXYInPossibleCaptures(i, j)"
+                [class.possible-point]="engineFacade.board.isXYInPossibleMoves(i, j) && showLegalMoves"
+                [style.background-color]="getTileBackgroundColor(i, j)"
+                *ngFor="let col of row; let j = index"
+            >
+                <span
+                    class="yCoord"
+                    [style.color]="(i % 2 === 0) ? lightTileColor : darkTileColor"
+                    [style.font-size.px]="pieceSize / 4"
+                    *ngIf="showCoords && j === 7"
+                >
+                    {{engineFacade.coords.yCoords[i]}}
+                </span>
+                <span
+                    class="xCoord"
+                    [style.color]="(j % 2 === 0) ? lightTileColor : darkTileColor"
+                    [style.font-size.px]="pieceSize / 4"
+                    *ngIf="showCoords && i === 7"
+                >
+                    {{engineFacade.coords.xCoords[j]}}
+                </span>
+                <div
+                    *ngIf="engineFacade.board.getPieceByPoint(i, j) as piece"
+                    style="height:100%; width:100%"
+                >
+                    <div
+                        [ngClass]="'piece'"
+                        [style.font-size]="pieceSize + 'px'"
+
+                    >
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <svg
+        [attr.height]="engineFacade.heightAndWidth"
+        [attr.width]="engineFacade.heightAndWidth"
+        style="position:absolute; top:0; pointer-events: none"
+    >
+        <defs *ngFor="let color of ['red', 'green', 'blue', 'orange']">
+            <marker
+                [id]="randomId + color + 'Arrow'"
+                markerHeight="13"
+                markerWidth="13"
+                orient="auto"
+                refX="9"
+                refY="6"
+            >
+                <path
+                    [style.fill]="color"
+                    d="M2,2 L2,11 L10,6 L2,2"
+                ></path>
+            </marker>
+        </defs>
+        <line
+            class="arrow"
+            [attr.marker-end]="'url(#' + randomId + arrow.end.color + 'Arrow)'"
+            [attr.stroke]="arrow.end.color"
+            [attr.x1]="arrow.start.x"
+            [attr.x2]="arrow.end.x"
+            [attr.y1]="arrow.start.y"
+            [attr.y2]="arrow.end.y"
+            *ngFor="let arrow of engineFacade.drawProvider.arrows$ | async"
+        ></line>
+        <circle
+            [attr.cx]="circle.drawPoint.x"
+            [attr.cy]="circle.drawPoint.y"
+            [attr.r]="engineFacade.heightAndWidth / 18"
+            [attr.stroke]="circle.drawPoint.color"
+            *ngFor="let circle of engineFacade.drawProvider.circles$ | async"
+            fill-opacity="0.0"
+            stroke-width="2"
+        ></circle>
+    </svg>
+    <app-piece-promotion-modal #modal
+                               [pieceIconInput]="engineFacade.pieceIconManager.pieceIconInput"
+                               [color]="engineFacade.board.getCurrentPlayerColor() ? 'white' : 'black'"></app-piece-promotion-modal>
+</div>
