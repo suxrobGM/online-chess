@@ -26,7 +26,10 @@
     "paths": {
       "ngx-chess-board": [
         "./dist/ngx-chess-board"
-      ]
+      ],
+      "@chessmate-app/*": [
+        "./projects/chessmate-app/src/app/*"
+      ],
     },
   },
   "angularCompilerOptions": {

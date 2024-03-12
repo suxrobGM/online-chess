@@ -4,26 +4,6 @@
   "compilerOptions": {
     "outDir": "../../out-tsc/app",
     "types": [],
-    "paths": {
-      "ngx-chess-board": [
-        "../../dist/ngx-chess-board"
-      ],
-      "@configs": [
-        "./src/app/configs/index"
-      ],
-      "@core/*": [
-        "./src/app/core/*"
-      ],
-      "@shared/*": [
-        "./src/app/shared/*"
-      ],
-      "@pages/*": [
-        "./src/app/pages/*"
-      ],
-      "@layout": [
-        "./src/app/layout/index"
-      ]
-    },
   },
   "files": [
     "src/main.ts"

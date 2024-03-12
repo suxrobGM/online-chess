@@ -1,6 +1,8 @@
 import {Component, type OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {NgxChessBoardModule} from 'ngx-chess-board';
+import {ChessboardComponent} from '@chessmate-app/shared/components';
+
+
 
 @Component({
   selector: 'app-home',
@@ -9,7 +11,7 @@ import {NgxChessBoardModule} from 'ngx-chess-board';
   standalone: true,
   imports: [
     CommonModule,
-    NgxChessBoardModule
+    ChessboardComponent,
   ],
 })
 export class HomeComponent implements OnInit {
