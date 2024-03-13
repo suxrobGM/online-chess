@@ -1,6 +1,6 @@
 package com.silyosbekov.chessmate.engine;
 
-import com.silyosbekov.chessmate.engine.utils.StringUtils;
+import com.silyosbekov.chessmate.engine.util.StringUtils;
 
 import java.util.regex.Pattern;
 

@@ -13,12 +13,12 @@
 
 package com.silyosbekov.chessmate.engine;
 
-import com.silyosbekov.chessmate.engine.constants.*;
-import com.silyosbekov.chessmate.engine.options.MoveOptions;
-import com.silyosbekov.chessmate.engine.utils.ArrayUtils;
-import com.silyosbekov.chessmate.engine.utils.EncodingUtils;
-import com.silyosbekov.chessmate.engine.utils.StringUtils;
-import com.silyosbekov.chessmate.engine.options.MovesOptions;
+import com.silyosbekov.chessmate.engine.constant.*;
+import com.silyosbekov.chessmate.engine.option.MoveOptions;
+import com.silyosbekov.chessmate.engine.util.ArrayUtils;
+import com.silyosbekov.chessmate.engine.util.EncodingUtils;
+import com.silyosbekov.chessmate.engine.util.StringUtils;
+import com.silyosbekov.chessmate.engine.option.MovesOptions;
 
 import java.util.*;
 import java.util.function.Function;
@@ -138,7 +138,8 @@ public class Chess {
     public void clear(boolean preserveHeaders) {
         if (!preserveHeaders) {
             headers.clear();
-        } else {
+        }
+        else {
            this.headers.remove("SetUp");
            this.headers.remove("FEN");
         }
@@ -863,7 +864,8 @@ public class Chess {
         if ((move.getFlags() & Bits.EP_CAPTURE) != 0) {
             if (turn == PieceColors.BLACK) {
                 board[move.getTo() - 16] = null;
-            } else {
+            }
+            else {
                 board[move.getFrom() + 16] = null;
             }
         }
@@ -931,7 +933,8 @@ public class Chess {
             else {
                 epSquare = move.getTo() + 16;
             }
-        } else {
+        }
+        else {
             epSquare = EMPTY;
         }
 
