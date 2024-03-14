@@ -31,7 +31,7 @@ public class GameController {
     public ResponseEntity<GameDto> createGame(@RequestBody CreateGameDto createGameDto) {
         var whitePlayerId = UUID.fromString(createGameDto.getWhitePlayerId());
         var blackPlayerId = createGameDto.getBlackPlayerId() != null ? UUID.fromString(createGameDto.getBlackPlayerId()) : null;
-        var game = gameService.createGame(whitePlayerId, blackPlayerId);
+        var game = gameService.createNewGame(whitePlayerId, blackPlayerId);
         var gameDto = GameMapper.toDto(game);
         return ResponseEntity.ok(gameDto);
     }

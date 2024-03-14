@@ -20,14 +20,21 @@ public final class GameMapper {
             return null;
         }
 
-        var dto = new GameDto();
-        dto.setId(game.getId().toString());
-        dto.setWhitePlayerId(game.getWhitePlayer().getId().toString());
-        dto.setBlackPlayerId(game.getBlackPlayer().getId().toString());
-        dto.setWinnerPlayerId(game.getWinnerPlayer() != null ? game.getWinnerPlayer().getId().toString() : null);
-        dto.setStatus(game.getStatus().name());
-        dto.setTurnPlayerId(game.getCurrentTurnPlayerId().toString());
-        dto.setCreatedDate(game.getCreatedDate().toString());
-        return dto;
+        return new GameDto(
+                game.getId().toString(),
+                game.getWhitePlayerId().toString(),
+                game.getWhitePlayerUsername(),
+                game.getWhitePlayer() != null ? game.getWhitePlayer().getElo() : 0,
+                game.getBlackPlayerId().toString(),
+                game.getBlackPlayerUsername(),
+                game.getBlackPlayer() != null ? game.getBlackPlayer().getElo() : 0,
+                game.getWinnerPlayerId().toString(),
+                game.getStatus().name(),
+                game.getCurrentTurnPlayerId().toString(),
+                game.isRanked(),
+                game.isTimerEnabled(),
+                game.getPgn(),
+                game.getCreatedDate().toString()
+        );
     }
 }

@@ -33,6 +33,9 @@ public class Game extends AuditableEntity {
     @Column(name = "is_timer_enabled")
     private boolean isTimerEnabled = false;
 
+    @Column(name = "is_ranked")
+    private boolean isRanked = false;
+
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private GameStatus status = GameStatus.OPEN;
@@ -112,11 +115,27 @@ public class Game extends AuditableEntity {
         return blackPlayer != null ? blackPlayer.getId() : blackAnonymousPlayerId;
     }
 
+    public String getWhitePlayerUsername() {
+        return whitePlayer != null ? whitePlayer.getUsername() : "Anonymous";
+    }
+
+    public String getBlackPlayerUsername() {
+        return blackPlayer != null ? blackPlayer.getUsername() : "Anonymous";
+    }
+
     public boolean isTimerEnabled() {
         return isTimerEnabled;
     }
 
     public void setTimerEnabled(boolean isTimerEnabled) {
         this.isTimerEnabled = isTimerEnabled;
+    }
+
+    public boolean isRanked() {
+        return isRanked;
+    }
+
+    public void setRanked(boolean isRanked) {
+        this.isRanked = isRanked;
     }
 }
