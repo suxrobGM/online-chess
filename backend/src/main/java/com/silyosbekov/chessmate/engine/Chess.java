@@ -1281,7 +1281,7 @@ public class Chess {
         var headersArr = headerStr.split(newline);
         var key = "";
         var value = "";
-        var regex = Pattern.compile("^\\s*\\[\\s*([A-Za-z]+)\\s*\"(.*)\"\\s*\\]\\s*$");
+        var regex = Pattern.compile("^\\s*\\[\\s*([A-Za-z]+)\\s*\"(.*)\"\\s*]\\s*$");
 
         for (var header : headersArr) {
             var matcher = regex.matcher(header);

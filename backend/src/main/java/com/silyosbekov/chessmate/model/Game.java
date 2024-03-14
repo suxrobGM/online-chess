@@ -1,39 +1,44 @@
 package com.silyosbekov.chessmate.model;
 
 import jakarta.persistence.*;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 /**
  * Game entity. Represents a game between two players.
- * It contains the game's metadata and moves.
+ * It contains the players' ids, the current turn player's id, the game's status, and the game's PGN.
  */
 @Entity
 @Table(name = "games")
 public class Game extends AuditableEntity {
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "white_player_id", nullable = false)
+    @JoinColumn(name = "white_player_id")
     private Player whitePlayer;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "black_player_id", nullable = false)
-    private Player blackPlayer;
+    @Column(name = "white_anonymous_player_id")
+    private UUID whiteAnonymousPlayerId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "winner_player_id")
-    private Player winnerPlayer;
+    @JoinColumn(name = "black_player_id")
+    private Player blackPlayer;
+
+    @Column(name = "black_anonymous_player_id")
+    private UUID blackAnonymousPlayerId;
+
+    @Column(name = "winner_player_id")
+    private UUID winnerPlayerId;
 
     @Column(name = "current_turn_player_id", nullable = false)
     private UUID currentTurnPlayerId;
 
+    @Column(name = "is_timer_enabled")
+    private boolean isTimerEnabled = false;
+
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private GameStatus status;
+    private GameStatus status = GameStatus.OPEN;
 
-    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private List<Move> moves = new ArrayList<>();
+    @Column(nullable = false)
+    private String pgn = "";
 
     public Player getWhitePlayer() {
         return whitePlayer;
@@ -67,23 +72,51 @@ public class Game extends AuditableEntity {
         this.status = status;
     }
 
-    public Player getWinnerPlayer() {
-        return winnerPlayer;
+    public UUID getWinnerPlayerId() {
+        return winnerPlayerId;
     }
 
-    public void setWinnerPlayer(Player winnerPlayer) {
-        this.winnerPlayer = winnerPlayer;
+    public void setWinnerPlayerId(UUID winnerPlayerId) {
+        this.winnerPlayerId = winnerPlayerId;
     }
 
-    public List<Move> getMoves() {
-        return moves;
+    public String getPgn() {
+        return pgn;
     }
 
-    public enum GameStatus {
-        OPEN,
-        ONGOING,
-        DRAW,
-        RESIGNED,
-        COMPLETED
+    public void setPgn(String pgn) {
+        this.pgn = pgn;
+    }
+
+    public UUID getWhiteAnonymousPlayerId() {
+        return whiteAnonymousPlayerId;
+    }
+
+    public void setWhiteAnonymousPlayerId(UUID whiteAnonymousPlayerId) {
+        this.whiteAnonymousPlayerId = whiteAnonymousPlayerId;
+    }
+
+    public UUID getBlackAnonymousPlayerId() {
+        return blackAnonymousPlayerId;
+    }
+
+    public void setBlackAnonymousPlayerId(UUID blackAnonymousPlayerId) {
+        this.blackAnonymousPlayerId = blackAnonymousPlayerId;
+    }
+
+    public UUID getWhitePlayerId() {
+        return whitePlayer != null ? whitePlayer.getId() : whiteAnonymousPlayerId;
+    }
+
+    public UUID getBlackPlayerId() {
+        return blackPlayer != null ? blackPlayer.getId() : blackAnonymousPlayerId;
+    }
+
+    public boolean isTimerEnabled() {
+        return isTimerEnabled;
+    }
+
+    public void setTimerEnabled(boolean isTimerEnabled) {
+        this.isTimerEnabled = isTimerEnabled;
     }
 }

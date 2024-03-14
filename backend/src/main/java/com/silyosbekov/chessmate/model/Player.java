@@ -20,6 +20,8 @@ public class Player extends AuditableEntity {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Column()
+    private int elo = 1200; // Default ELO rating
 
     public String getFirstName() {
         return firstName;
@@ -51,5 +53,13 @@ public class Player extends AuditableEntity {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public int getElo() {
+        return elo;
+    }
+
+    public void setElo(int elo) {
+        this.elo = elo;
     }
 }
