@@ -9,31 +9,31 @@ class CreateGameDtoTest {
     void createGameDtoShouldInitializeWithGivenValues() {
         var whitePlayerId = "whitePlayerId";
         var blackPlayerId = "blackPlayerId";
-        var createGameDto = new CreateGameDto(whitePlayerId, blackPlayerId);
-        assertEquals(whitePlayerId, createGameDto.getWhitePlayerId());
-        assertEquals(blackPlayerId, createGameDto.getBlackPlayerId());
+        var createGameDto = new NewGameDto(whitePlayerId, blackPlayerId);
+        assertEquals(whitePlayerId, createGameDto.whitePlayerId());
+        assertEquals(blackPlayerId, createGameDto.blackPlayerId());
     }
 
     @Test
     void createGameDtoShouldReturnNullForWhitePlayerIdWhenInitializedWithNull() {
         var blackPlayerId = "blackPlayerId";
-        var createGameDto = new CreateGameDto(null, blackPlayerId);
-        assertNull(createGameDto.getWhitePlayerId());
-        assertEquals(blackPlayerId, createGameDto.getBlackPlayerId());
+        var createGameDto = new NewGameDto(null, blackPlayerId);
+        assertNull(createGameDto.whitePlayerId());
+        assertEquals(blackPlayerId, createGameDto.blackPlayerId());
     }
 
     @Test
     void createGameDtoShouldReturnNullForBlackPlayerIdWhenInitializedWithNull() {
         var whitePlayerId = "whitePlayerId";
-        var createGameDto = new CreateGameDto(whitePlayerId, null);
-        assertEquals(whitePlayerId, createGameDto.getWhitePlayerId());
-        assertNull(createGameDto.getBlackPlayerId());
+        var createGameDto = new NewGameDto(whitePlayerId, null);
+        assertEquals(whitePlayerId, createGameDto.whitePlayerId());
+        assertNull(createGameDto.blackPlayerId());
     }
 
     @Test
     void createGameDtoShouldReturnNullForBothPlayerIdsWhenInitializedWithNull() {
-        var createGameDto = new CreateGameDto(null, null);
-        assertNull(createGameDto.getWhitePlayerId());
-        assertNull(createGameDto.getBlackPlayerId());
+        var createGameDto = new NewGameDto(null, null);
+        assertNull(createGameDto.whitePlayerId());
+        assertNull(createGameDto.blackPlayerId());
     }
 }

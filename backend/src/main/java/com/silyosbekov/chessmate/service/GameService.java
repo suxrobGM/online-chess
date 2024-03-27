@@ -28,14 +28,18 @@ public class GameService {
      * @param whitePlayerId The ID of the player who will play as white
      * @param blackPlayerId The ID of the player who will play as black, or null if the game is not full
      * @throws NoSuchElementException if the white player does not exist, or if the black player does not exist
+     * @throws IllegalStateException if the white player or black player ID format is invalid UUID
      * @return The newly created game
      */
-    public Game createNewGame(UUID whitePlayerId, UUID blackPlayerId) {
-        var whitePlayer = playerRepository.findById(whitePlayerId).orElseThrow();
+    public Game createNewGame(String whitePlayerId, String blackPlayerId) {
+        var whitePlayerUUID = UUID.fromString(whitePlayerId);
+        var blackPlayerUUID = blackPlayerId != null ? UUID.fromString(blackPlayerId) : null;
+
+        var whitePlayer = playerRepository.findById(whitePlayerUUID).orElseThrow();
         Player blackPlayer = null;
 
         if (blackPlayerId != null) {
-            blackPlayer = playerRepository.findById(blackPlayerId).orElseThrow();
+            blackPlayer = playerRepository.findById(blackPlayerUUID).orElseThrow();
         }
 
         var game = new Game();
