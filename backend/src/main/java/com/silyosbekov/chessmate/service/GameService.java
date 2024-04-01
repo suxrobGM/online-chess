@@ -3,6 +3,7 @@ package com.silyosbekov.chessmate.service;
 import com.silyosbekov.chessmate.engine.Pgn;
 import com.silyosbekov.chessmate.model.Game;
 import com.silyosbekov.chessmate.model.GameStatus;
+import com.silyosbekov.chessmate.model.PlayerColor;
 import com.silyosbekov.chessmate.repository.GameRepository;
 import com.silyosbekov.chessmate.model.Player;
 import com.silyosbekov.chessmate.repository.PlayerRepository;
@@ -24,110 +25,62 @@ public class GameService {
     }
 
     /**
+     * Get a game by its ID
+     * @param gameId The ID of the game
+     * @throws NoSuchElementException if the game does not exist
+     * @return The game
+     */
+    public Game getGameById(String gameId) {
+        var gameUUID = UUID.fromString(gameId);
+        return gameRepository.findById(gameUUID).orElseThrow();
+    }
+
+    /**
      * Create a new game
-     * @param whitePlayerId The ID of the player who will play as white
-     * @param blackPlayerId The ID of the player who will play as black, or null if the game is not full
-     * @throws NoSuchElementException if the white player does not exist, or if the black player does not exist
-     * @throws IllegalStateException if the white player or black player ID format is invalid UUID
+     * @param hostPlayerId The ID of the player who will host the game
+     * @param hostPlayerColor The color of the host player
+     * @throws NoSuchElementException if the host player does not exist
+     * @throws IllegalStateException if the host player ID format is invalid UUID
      * @return The newly created game
      */
-    public Game createNewGame(String whitePlayerId, String blackPlayerId) {
-        var whitePlayerUUID = UUID.fromString(whitePlayerId);
-        var blackPlayerUUID = blackPlayerId != null ? UUID.fromString(blackPlayerId) : null;
-
-        var whitePlayer = playerRepository.findById(whitePlayerUUID).orElseThrow();
-        Player blackPlayer = null;
-
-        if (blackPlayerId != null) {
-            blackPlayer = playerRepository.findById(blackPlayerUUID).orElseThrow();
-        }
-
-        var game = new Game();
-        game.setWhitePlayer(whitePlayer);
-        game.setBlackPlayer(blackPlayer);
-        game.setCurrentTurnPlayerId(whitePlayer.getId());
-        game.setStatus(GameStatus.OPEN);
-        var pgn = new Pgn(whitePlayer.getUsername());
-
-        if (blackPlayer != null) {
-            pgn.setBlackPlayer(blackPlayer.getUsername());
-        }
-
-        game.setPgn(pgn.toString());
-        return gameRepository.save(game);
+    public Game createNewGame(String hostPlayerId, PlayerColor hostPlayerColor) {
+        var hostPlayerUUID = UUID.fromString(hostPlayerId);
+        var hostPlayer = playerRepository.findById(hostPlayerUUID).orElseThrow();
+        return createGameWithHostPlayer(hostPlayer, hostPlayerColor, null);
     }
 
     /**
      * Create a new anonymous game
-     * @param whiteAnonymousPlayerId The ID of the anonymous player who will play as white
-     * @param blackAnonymousPlayerId The ID of the anonymous player who will play as black, or null if the game is not full
+     * @param hostPlayerColor The color of the host player
      * @return The newly created game
      */
-    public Game createNewAnonymousGame(UUID whiteAnonymousPlayerId, UUID blackAnonymousPlayerId) {
+    public Game createNewAnonymousGame(PlayerColor hostPlayerColor) {
+        var hostPlayerId = UUID.randomUUID(); // Generate UUID for anonymous player
+        return createGameWithHostPlayer(null, hostPlayerColor, hostPlayerId);
+    }
+
+    private Game createGameWithHostPlayer(Player hostPlayer, PlayerColor hostPlayerColor, UUID anonymousPlayerId) {
         var game = new Game();
-        game.setWhiteAnonymousPlayerId(whiteAnonymousPlayerId);
-        game.setBlackAnonymousPlayerId(blackAnonymousPlayerId);
-        game.setCurrentTurnPlayerId(whiteAnonymousPlayerId);
+
+        if (hostPlayerColor == PlayerColor.WHITE) {
+            if (hostPlayer != null) {
+                game.setWhitePlayer(hostPlayer);
+            }
+            else {
+                game.setWhiteAnonymousPlayerId(anonymousPlayerId);
+            }
+        }
+        else {
+            if (hostPlayer != null) {
+                game.setBlackPlayer(hostPlayer);
+            }
+            else {
+                game.setBlackAnonymousPlayerId(anonymousPlayerId);
+            }
+        }
         game.setStatus(GameStatus.OPEN);
-        var pgn = new Pgn("Anonymous");
 
-        if (blackAnonymousPlayerId != null) {
-            pgn.setBlackPlayer("Anonymous");
-        }
-
-        game.setPgn(pgn.toString());
-        return gameRepository.save(game);
-    }
-
-    /**
-     * Join a game as the black player
-     * @param gameId The ID of the game to join
-     * @param blackPlayerId The ID of the player who will play as black
-     * @throws IllegalStateException if the game is already full
-     * @throws NoSuchElementException if the game does not exist, or if the player does not exist
-     * @return The updated game
-     */
-    public Game joinExistingGame(UUID gameId, UUID blackPlayerId) {
-        var game = gameRepository.findById(gameId).orElseThrow();
-
-        if (game.getBlackPlayer() != null) {
-            throw new IllegalStateException("Game is already full");
-        }
-
-        var player = playerRepository.findById(blackPlayerId).orElseThrow();
-        game.setBlackPlayer(player);
-        game.setCurrentTurnPlayerId(player.getId());
-        game.setStatus(GameStatus.ONGOING);
-
-        var pgn = Pgn.fromString(game.getPgn());
-        pgn.setBlackPlayer(player.getUsername());
-        pgn.setBlackTurn();
-        game.setPgn(pgn.toString());
-        return gameRepository.save(game);
-    }
-
-    /**
-     * Join a game as the black anonymous player
-     * @param gameId The ID of the game to join
-     * @param blackAnonymousPlayerId The ID of the anonymous player who will play as black
-     * @throws IllegalStateException if the game is already full
-     * @throws NoSuchElementException if the game does not exist
-     * @return The updated game
-     */
-    public Game joinExistingGameAsAnonymous(UUID gameId, UUID blackAnonymousPlayerId) {
-        var game = gameRepository.findById(gameId).orElseThrow();
-
-        if (game.getBlackAnonymousPlayerId() != null) {
-            throw new IllegalStateException("Game is already full");
-        }
-
-        game.setBlackAnonymousPlayerId(blackAnonymousPlayerId);
-        game.setCurrentTurnPlayerId(blackAnonymousPlayerId);
-        game.setStatus(GameStatus.ONGOING);
-
-        var pgn = Pgn.fromString(game.getPgn());
-        pgn.setBlackPlayer("Anonymous");
-        pgn.setBlackTurn();
+        var pgn = new Pgn();
         game.setPgn(pgn.toString());
         return gameRepository.save(game);
     }
@@ -137,17 +90,21 @@ public class GameService {
      * @param gameId The ID of the game
      * @param playerId The ID of the player whose turn it is
      * @throws NoSuchElementException if the player does not exist in the game
+     * @throws IllegalArgumentException if game ID or player ID format is invalid UUID
      * @return The updated game
      */
-    public Game setCurrentTurnPlayer(UUID gameId, UUID playerId) {
-        var game = gameRepository.findById(gameId).orElseThrow();
+    public Game setCurrentTurnPlayer(String gameId, String playerId) {
+        var gameUUID = UUID.fromString(gameId);
+        var playerUUID = UUID.fromString(playerId);
+
+        var game = gameRepository.findById(gameUUID).orElseThrow();
         var pgn = Pgn.fromString(game.getPgn());
 
-        if (game.getBlackPlayerId().equals(playerId)) {
+        if (game.getBlackPlayerId().equals(playerUUID)) {
             game.setCurrentTurnPlayerId(game.getBlackPlayerId());
             pgn.setBlackTurn();
         }
-        else if (game.getWhitePlayerId().equals(playerId)) {
+        else if (game.getWhitePlayerId().equals(playerUUID)) {
             game.setCurrentTurnPlayerId(game.getWhitePlayerId());
             pgn.setWhiteTurn();
         }
@@ -160,48 +117,25 @@ public class GameService {
     }
 
     /**
-     * Complete a game
-     * @param gameId The ID of the game to complete
-     * @param winnerId The ID of the winning player
-     * @throws NoSuchElementException if the winner does not exist or if the game does not exist
-     * @return The updated game
-     */
-    public Game completeGame(UUID gameId, UUID winnerId) {
-        var game = gameRepository.findById(gameId).orElseThrow();
-        var pgn = Pgn.fromString(game.getPgn());
-
-        if (winnerId != null && winnerId.equals(game.getWhitePlayerId())){
-            game.setWinnerPlayerId(winnerId);
-            pgn.setWhiteWinResult();
-        }
-        else if (winnerId != null && winnerId.equals(game.getBlackPlayerId())) {
-            game.setWinnerPlayerId(winnerId);
-            pgn.setBlackWinResult();
-        }
-        else {
-            throw new NoSuchElementException("Winner with '%s' does not exist in the game".formatted(winnerId));
-        }
-
-        game.setStatus(GameStatus.COMPLETED);
-        return gameRepository.save(game);
-    }
-
-    /**
      * Resign from a game
      * @param gameId The ID of the game to resign from
      * @param playerId The ID of the player who is resigning
      * @throws NoSuchElementException if the game does not exist or if the player does not exist in the game
+     * @throws IllegalArgumentException if game ID or player ID format is invalid UUID
      * @return The updated game
      */
-    public Game resignGame(UUID gameId, UUID playerId) {
-        var game = gameRepository.findById(gameId).orElseThrow();
+    public Game resignGame(String gameId, String playerId) {
+        var gameUUID = UUID.fromString(gameId);
+        var playerUUID = UUID.fromString(playerId);
+
+        var game = gameRepository.findById(gameUUID).orElseThrow();
         var pgn = Pgn.fromString(game.getPgn());
 
-        if (game.getWhitePlayerId().equals(playerId)) { // White player resigned
+        if (game.getWhitePlayerId().equals(playerUUID)) { // White player resigned
             game.setWinnerPlayerId(game.getBlackPlayerId()); // Black player wins
             pgn.setBlackWinResult();
         }
-        else if (game.getBlackPlayerId().equals(playerId)) { // Black player resigned
+        else if (game.getBlackPlayerId().equals(playerUUID)) { // Black player resigned
             game.setWinnerPlayerId(game.getWhitePlayerId()); // White player wins
             pgn.setWhiteWinResult();
         }
@@ -218,10 +152,13 @@ public class GameService {
      * Draw a game
      * @param gameId The ID of the game to draw
      * @throws NoSuchElementException if the game does not exist
+     * @throws IllegalArgumentException if game ID format is invalid UUID
      * @return The updated game
      */
-    public Game drawGame(UUID gameId) {
-        var game = gameRepository.findById(gameId).orElseThrow();
+    public Game drawGame(String gameId) {
+        var gameUUID = UUID.fromString(gameId);
+
+        var game = gameRepository.findById(gameUUID).orElseThrow();
         var pgn = Pgn.fromString(game.getPgn());
         pgn.setDrawResult();
 
@@ -234,12 +171,14 @@ public class GameService {
      * Abort a game
      * @param gameId The ID of the game to abort
      * @throws NoSuchElementException if the game does not exist
+     * @throws IllegalArgumentException if game ID format is invalid UUID
      * @return The updated game
      */
-    public Game abortGame(UUID gameId) {
-        var game = gameRepository.findById(gameId).orElseThrow();
+    public Game abortGame(String gameId) {
+        var gameUUID = UUID.fromString(gameId);
+
+        var game = gameRepository.findById(gameUUID).orElseThrow();
         game.setStatus(GameStatus.ABORTED);
         return gameRepository.save(game);
     }
 }
-

@@ -1,6 +1,5 @@
 package com.silyosbekov.chessmate.controller;
 
-import com.silyosbekov.chessmate.dto.CreateGameCommand;
 import com.silyosbekov.chessmate.dto.GameDto;
 import com.silyosbekov.chessmate.mapper.GameMapper;
 import com.silyosbekov.chessmate.service.GameService;
@@ -18,12 +17,12 @@ public class GameController {
 
     /**
      * Create a new chess game
-     * @param command - the game to create, with the white player's ID and optionally the black player's ID
+     * @param id - The game ID
      * @return The newly created game as a DTO
      */
-    @PostMapping
-    public ResponseEntity<GameDto> createGame(@RequestBody CreateGameCommand command) {
-        var game = gameService.createNewGame(command.whitePlayerId(), command.blackPlayerId());
+    @PostMapping("{id}")
+    public ResponseEntity<GameDto> getGameById(@PathVariable("id") String id) {
+        var game = gameService.getGameById(id);
         var gameDto = GameMapper.toDto(game);
         return ResponseEntity.ok(gameDto);
     }

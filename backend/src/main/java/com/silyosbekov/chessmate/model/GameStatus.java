@@ -6,5 +6,6 @@ public enum GameStatus {
     DRAW,
     RESIGNED,
     COMPLETED,
-    ABORTED
+    ABORTED,
+    ABANDONED
 }

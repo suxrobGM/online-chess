@@ -47,16 +47,16 @@ public class Game extends AuditableEntity {
         return whitePlayer;
     }
 
-    public void setWhitePlayer(Player playerOneId) {
-        this.whitePlayer = playerOneId;
+    public void setWhitePlayer(Player whitePlayerId) {
+        this.whitePlayer = whitePlayerId;
     }
 
     public Player getBlackPlayer() {
         return blackPlayer;
     }
 
-    public void setBlackPlayer(Player playerTwoId) {
-        this.blackPlayer = playerTwoId;
+    public void setBlackPlayer(Player setBlackPlayer) {
+        this.blackPlayer = setBlackPlayer;
     }
 
     public UUID getCurrentTurnPlayerId() {
@@ -137,5 +137,55 @@ public class Game extends AuditableEntity {
 
     public void setRanked(boolean isRanked) {
         this.isRanked = isRanked;
+    }
+
+    public boolean isFull() {
+        return whitePlayer != null && blackPlayer != null;
+    }
+
+    /**
+     * Sets the player to the game. If the game is full, the player is not added.
+     * If added player is white, sets the current turn player to white. Otherwise, sets it to black.
+     * @param player The player to add
+     * @return The color of the player in the game, or null if the game is full.
+     */
+    public PlayerColor setPlayer(Player player) {
+        if (isFull()) {
+            return null;
+        }
+
+        if (whitePlayer == null) {
+            whitePlayer = player;
+            setCurrentTurnPlayerId(whitePlayer.getId());
+            return PlayerColor.WHITE;
+        }
+        else {
+            blackPlayer = player;
+            setCurrentTurnPlayerId(blackPlayer.getId());
+            return PlayerColor.BLACK;
+        }
+    }
+
+    /**
+     * Sets the anonymous player to the game. If the game is full, the player is not added.
+     * If added player is white, sets the current turn player to white. Otherwise, sets it to black.
+     * @param playerId The player's id to add
+     * @return The color of the player in the game, or null if the game is full.
+     */
+    public PlayerColor setAnonymousPlayer(UUID playerId) {
+        if (isFull()) {
+            return null;
+        }
+
+        if (whitePlayer == null) {
+            whiteAnonymousPlayerId = playerId;
+            setCurrentTurnPlayerId(whiteAnonymousPlayerId);
+            return PlayerColor.WHITE;
+        }
+        else {
+            blackAnonymousPlayerId = playerId;
+            setCurrentTurnPlayerId(blackAnonymousPlayerId);
+            return PlayerColor.BLACK;
+        }
     }
 }
