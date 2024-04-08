@@ -71,7 +71,7 @@ class GameMapperTest {
         assertEquals(game.getBlackPlayer().getId(), result.blackPlayerId());
         assertEquals(game.getWinnerPlayer(), result.winnerPlayer());
         assertEquals(game.getStatus().name(), result.status());
-        assertEquals(game.getCurrentTurn(), result.currentTurnPlayer());
+        assertEquals(game.getCurrentTurn(), result.currentTurn());
         assertEquals(game.getCreatedDate(), result.createdDate());
     }
 
