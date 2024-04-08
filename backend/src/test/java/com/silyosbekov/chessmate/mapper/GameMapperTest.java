@@ -2,6 +2,7 @@ package com.silyosbekov.chessmate.mapper;
 
 import com.silyosbekov.chessmate.engine.util.ArrayUtils;
 import com.silyosbekov.chessmate.model.Game;
+import com.silyosbekov.chessmate.model.GameStatus;
 import com.silyosbekov.chessmate.model.Player;
 import org.junit.jupiter.api.Test;
 import java.util.UUID;
@@ -56,8 +57,8 @@ class GameMapperTest {
         var game = new Game();
         game.setWhitePlayer(new Player());
         game.setBlackPlayer(new Player());
-        game.setWinnerPlayer(new Player());
-        game.setStatus(Game.GameStatus.OPEN);
+        game.setWinnerPlayerId(game.getWhitePlayerId());
+        game.setStatus(GameStatus.OPEN);
         game.setCurrentTurnPlayerId(UUID.randomUUID());
 
         // Act
@@ -65,13 +66,13 @@ class GameMapperTest {
 
         // Assert
         assertNotNull(result);
-        assertEquals(game.getId().toString(), result.getId());
-        assertEquals(game.getWhitePlayer().getId().toString(), result.getWhitePlayerId());
-        assertEquals(game.getBlackPlayer().getId().toString(), result.getBlackPlayerId());
-        assertEquals(game.getWinnerPlayer().getId().toString(), result.getWinnerPlayerId());
-        assertEquals(game.getStatus().name(), result.getStatus());
-        assertEquals(game.getCurrentTurnPlayerId().toString(), result.getTurnPlayerId());
-        assertEquals(game.getCreatedDate().toString(), result.getCreatedDate());
+        assertEquals(game.getId(), result.id());
+        assertEquals(game.getWhitePlayer().getId(), result.whitePlayerId());
+        assertEquals(game.getBlackPlayer().getId(), result.blackPlayerId());
+        assertEquals(game.getWinnerPlayerId(), result.winnerPlayerId());
+        assertEquals(game.getStatus().name(), result.status());
+        assertEquals(game.getCurrentTurnPlayerId(), result.currentTurnPlayerId());
+        assertEquals(game.getCreatedDate(), result.createdDate());
     }
 
     @Test
@@ -89,8 +90,8 @@ class GameMapperTest {
         var game = new Game();
         game.setWhitePlayer(new Player());
         game.setBlackPlayer(new Player());
-        game.setWinnerPlayer(null);
-        game.setStatus(Game.GameStatus.OPEN);
+        game.setWinnerPlayerId(null);
+        game.setStatus(GameStatus.OPEN);
         game.setCurrentTurnPlayerId(UUID.randomUUID());
 
         // Act
@@ -98,6 +99,6 @@ class GameMapperTest {
 
         // Assert
         assertNotNull(result);
-        assertNull(result.getWinnerPlayerId());
+        assertNull(result.winnerPlayerId());
     }
 }

@@ -1,8 +1,10 @@
 package com.silyosbekov.chessmate.dto;
 
+import java.util.UUID;
+
 public record MakeMoveCommand(
-    String gameId,
-    String from,
-    String to)
+        UUID gameId,
+        String from,
+        String to)
 {
 }

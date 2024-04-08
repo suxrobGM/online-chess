@@ -32,24 +32,18 @@ public class MatchService {
         this.playerRepository = playerRepository;
     }
 
-    public Game joinGame(String gameId, String playerId) {
-        var gameUUID = UUID.fromString(gameId);
-        var playerUUID = UUID.fromString(playerId);
-
-        var game = gameRepository.findById(gameUUID).orElseThrow();
-        var player = playerRepository.findById(playerUUID).orElseThrow();
-        return joinGameCommon(game, gameUUID, player.getUsername(), playerUUID.toString());
+    public Game joinGame(UUID gameId, UUID playerId) {
+        var game = gameRepository.findById(gameId).orElseThrow();
+        var player = playerRepository.findById(playerId).orElseThrow();
+        return joinGameCommon(game, gameId, player.getUsername(), playerId);
     }
 
-    public Game joinAnonymousGame(String gameId, String playerId) {
-        var gameUUID = UUID.fromString(gameId);
-        var playerUUID = UUID.fromString(playerId);
-
-        var game = gameRepository.findById(gameUUID).orElseThrow();
-        return joinGameCommon(game, gameUUID, "Anonymous", playerUUID.toString());
+    public Game joinAnonymousGame(UUID gameId, UUID playerId) {
+        var game = gameRepository.findById(gameId).orElseThrow();
+        return joinGameCommon(game, gameId, "Anonymous", playerId);
     }
 
-    private Game joinGameCommon(Game game, UUID gameUUID, String playerName, String playerId) {
+    private Game joinGameCommon(Game game, UUID gameId, String playerName, UUID playerId) {
         if (game.isFull()) {
             throw new IllegalStateException("Game is already full");
         }
@@ -57,10 +51,10 @@ public class MatchService {
         PlayerColor playerColor;
 
         if (playerName.equals("Anonymous")) {
-            playerColor = game.setAnonymousPlayer(UUID.fromString(playerId));
+            playerColor = game.setAnonymousPlayer(playerId);
         }
         else {
-            var player = playerRepository.findById(UUID.fromString(playerId)).orElseThrow();
+            var player = playerRepository.findById(playerId).orElseThrow();
             playerColor = game.setPlayer(player);
         }
 
@@ -78,19 +72,16 @@ public class MatchService {
         }
 
         game.setPgn(pgn.toString());
-        activeGames.put(gameUUID, Pair.of(game, new Chess()));
+        activeGames.put(gameId, Pair.of(game, new Chess()));
         return gameRepository.save(game);
     }
 
-    public Game leaveGame(String gameId, String playerId) {
-        var gameUUID = UUID.fromString(gameId);
-        var playerUUID = UUID.fromString(playerId);
-
+    public Game leaveGame(UUID gameId, UUID playerId) {
         final Game game;
-        var activeGame = activeGames.get(gameUUID).item1();
+        var activeGame = activeGames.get(gameId).item1();
 
         if (activeGame == null) {
-            activeGame = gameRepository.findById(gameUUID).orElseThrow();
+            activeGame = gameRepository.findById(gameId).orElseThrow();
         }
 
         game = activeGame;
@@ -101,7 +92,7 @@ public class MatchService {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                completeAbandonedGame(game, playerUUID);
+                completeAbandonedGame(game, playerId);
             }
         }, 60000); // 60000 ms = 1 minute
 
@@ -135,9 +126,8 @@ public class MatchService {
         gameRepository.save(game);
     }
 
-    public MoveDto makeMove(String gameId, String from, String to)  {
-        var gameUUID = UUID.fromString(gameId);
-        var activeGame = activeGames.get(gameUUID);
+    public MoveDto makeMove(UUID gameId, String from, String to)  {
+        var activeGame = activeGames.get(gameId);
 
         if (activeGame == null) {
             throw new NoSuchElementException("Game with ID '%s' does not exist".formatted(gameId));

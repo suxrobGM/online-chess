@@ -21,20 +21,20 @@ public final class GameMapper {
         }
 
         return new GameDto(
-                game.getId().toString(),
-                game.getWhitePlayerId().toString(),
+                game.getId(),
+                game.getWhitePlayerId(),
                 game.getWhitePlayerUsername(),
                 game.getWhitePlayer() != null ? game.getWhitePlayer().getElo() : 0,
-                game.getBlackPlayerId().toString(),
+                game.getBlackPlayerId(),
                 game.getBlackPlayerUsername(),
                 game.getBlackPlayer() != null ? game.getBlackPlayer().getElo() : 0,
-                game.getWinnerPlayerId().toString(),
+                game.getWinnerPlayerId(),
                 game.getStatus().name(),
-                game.getCurrentTurnPlayerId().toString(),
+                game.getCurrentTurnPlayerId(),
                 game.isRanked(),
                 game.isTimerEnabled(),
                 game.getPgn(),
-                game.getCreatedDate().toString()
+                game.getCreatedDate()
         );
     }
 }

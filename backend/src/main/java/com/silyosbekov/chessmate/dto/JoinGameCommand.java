@@ -1,4 +1,6 @@
 package com.silyosbekov.chessmate.dto;
 
-public record JoinGameCommand(String gameId, String playerId) {
+import java.util.UUID;
+
+public record JoinGameCommand(UUID gameId, UUID playerId) {
 }

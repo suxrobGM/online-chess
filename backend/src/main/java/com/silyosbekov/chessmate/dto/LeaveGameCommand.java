@@ -1,4 +1,6 @@
 package com.silyosbekov.chessmate.dto;
 
-public record LeaveGameCommand(String gameId, String playerId) {
+import java.util.UUID;
+
+public record LeaveGameCommand(UUID gameId, UUID playerId) {
 }

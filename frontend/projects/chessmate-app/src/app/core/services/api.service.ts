@@ -5,9 +5,11 @@ import {APP_CONFIG} from '@chessmate-app/configs';
 import {ToastService} from '@chessmate-app/core/services';
 import {
   SearchableQuery,
-  PagedResult,
-  UserDto,
   Result,
+  CreateAnonymousGameCommand,
+  CreateGameCommand,
+  GameDto,
+  PagedResult,
 } from '@chessmate-app/core/models';
 
 @Injectable({providedIn: 'root'})
@@ -24,30 +26,35 @@ export class ApiService {
 
   //#region Users API
 
-  getUsers(query?: SearchableQuery): Observable<PagedResult<UserDto>> {
-    const url = `/users?${this.stringfySearchableQuery(query)}`;
-    return this.get(url);
-  }
+  // getUsers(query?: SearchableQuery): Observable<PagedResult<UserDto>> {
+  //   const url = `/users?${this.stringfySearchableQuery(query)}`;
+  //   return this.get(url);
+  // }
 
   //#endregion
 
 
-  //#region Clients API
+  //#region Game API
 
-  // getClient(id: string): Observable<Result<ClientDto>> {
-  //   const url = `/clients/${id}`;
-  //   return this.get(url);
-  // }
+  getGame(id: string): Observable<Result<GameDto>> {
+    const url = `/games/${id}`;
+    return this.get(url);
+  }
 
-  // getClients(query?: SearchableQuery): Observable<PagedResult<ClientDto>> {
-  //   const url = `/clients?${this.stringfySearchableQuery(query)}`;
-  //   return this.get(url);
-  // }
+  getGames(query?: SearchableQuery): Observable<PagedResult<GameDto>> {
+    const url = `/games?${this.stringfySearchableQuery(query)}`;
+    return this.get(url);
+  }
 
-  // createClient(command: CreateClientCommand): Observable<Result> {
-  //   const url = `/clients`;
-  //   return this.post(url, command);
-  // }
+  createGame(command: CreateGameCommand): Observable<Result> {
+    const url = `/games`;
+    return this.post(url, command);
+  }
+
+  createAnonymousGame(command: CreateAnonymousGameCommand): Observable<Result> {
+    const url = `/games/anonymous`;
+    return this.post(url, command);
+  }
 
   // updateClient(command: UpdateClientCommand): Observable<Result> {
   //   const url = `/clients/${command.id}`;

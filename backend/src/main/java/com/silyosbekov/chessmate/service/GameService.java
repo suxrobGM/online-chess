@@ -8,7 +8,10 @@ import com.silyosbekov.chessmate.repository.GameRepository;
 import com.silyosbekov.chessmate.model.Player;
 import com.silyosbekov.chessmate.repository.PlayerRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Random;
 import java.util.UUID;
 
 /**
@@ -30,9 +33,20 @@ public class GameService {
      * @throws NoSuchElementException if the game does not exist
      * @return The game
      */
-    public Game getGameById(String gameId) {
-        var gameUUID = UUID.fromString(gameId);
-        return gameRepository.findById(gameUUID).orElseThrow();
+    public Game getGameById(UUID gameId) {
+        return gameRepository.findById(gameId).orElseThrow();
+    }
+
+    /**
+     * Get all games
+     * @param gameStatus Filter games by status, or null to get all games
+     * @return List of all games
+     */
+    public List<Game> getGames(GameStatus gameStatus) {
+        if (gameStatus != null) {
+            return gameRepository.findByStatus(gameStatus);
+        }
+        return gameRepository.findAll();
     }
 
     /**
@@ -43,9 +57,8 @@ public class GameService {
      * @throws IllegalStateException if the host player ID format is invalid UUID
      * @return The newly created game
      */
-    public Game createNewGame(String hostPlayerId, PlayerColor hostPlayerColor) {
-        var hostPlayerUUID = UUID.fromString(hostPlayerId);
-        var hostPlayer = playerRepository.findById(hostPlayerUUID).orElseThrow();
+    public Game createNewGame(UUID hostPlayerId, PlayerColor hostPlayerColor) {
+        var hostPlayer = playerRepository.findById(hostPlayerId).orElseThrow();
         return createGameWithHostPlayer(hostPlayer, hostPlayerColor, null);
     }
 
@@ -59,8 +72,20 @@ public class GameService {
         return createGameWithHostPlayer(null, hostPlayerColor, hostPlayerId);
     }
 
+    /**
+     * Create a new game with a host player
+     * @param hostPlayer The player who will host the game
+     * @param hostPlayerColor The color of the host player, or null to randomly assign color to the host player
+     * @param anonymousPlayerId The ID of the anonymous player
+     * @return The newly created game
+     */
     private Game createGameWithHostPlayer(Player hostPlayer, PlayerColor hostPlayerColor, UUID anonymousPlayerId) {
         var game = new Game();
+
+        // Randomly assign color if not specified
+        if (hostPlayerColor == null) {
+            hostPlayerColor = new Random().nextBoolean() ? PlayerColor.WHITE : PlayerColor.BLACK;
+        }
 
         if (hostPlayerColor == PlayerColor.WHITE) {
             if (hostPlayer != null) {
@@ -78,6 +103,8 @@ public class GameService {
                 game.setBlackAnonymousPlayerId(anonymousPlayerId);
             }
         }
+
+        game.setCurrentTurnPlayerId(game.getWhitePlayerId());
         game.setStatus(GameStatus.OPEN);
 
         var pgn = new Pgn();
