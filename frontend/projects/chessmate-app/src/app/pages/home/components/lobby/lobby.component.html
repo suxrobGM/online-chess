@@ -1,0 +1,22 @@
+<h4>Lobby</h4>
+
+<p-table [value]="openGames" [paginator]="true" [rows]="10">
+  <ng-template pTemplate="header">
+    <tr>
+      <th>Color</th>
+      <th>Player</th>
+      <th>Rating</th>
+      <th>Time</th>
+      <th>Mode</th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-game>
+    <tr>
+      <td>{{ game.color }}</td>
+      <td>{{ game.player }}</td>
+      <td>{{ game.rating }}</td>
+      <td>--</td>
+      <td>Classic</td>
+    </tr>
+  </ng-template>
+</p-table>

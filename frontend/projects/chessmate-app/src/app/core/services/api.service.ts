@@ -5,11 +5,12 @@ import {APP_CONFIG} from '@chessmate-app/configs';
 import {ToastService} from '@chessmate-app/core/services';
 import {
   SearchableQuery,
-  Result,
+  //Result,
   CreateAnonymousGameCommand,
   CreateGameCommand,
   GameDto,
-  PagedResult,
+  //PagedResult,
+  GetGamesQuery,
 } from '@chessmate-app/core/models';
 
 @Injectable({providedIn: 'root'})
@@ -36,22 +37,27 @@ export class ApiService {
 
   //#region Game API
 
-  getGame(id: string): Observable<Result<GameDto>> {
+  getGame(id: string): Observable<GameDto> {
     const url = `/games/${id}`;
     return this.get(url);
   }
 
-  getGames(query?: SearchableQuery): Observable<PagedResult<GameDto>> {
-    const url = `/games?${this.stringfySearchableQuery(query)}`;
+  getGames(query?: GetGamesQuery): Observable<GameDto[]> {
+    let url = `/games`;
+
+    if (query?.gameStatus) {
+      url += `?gameStatus=${query.gameStatus}`;
+    }
+
     return this.get(url);
   }
 
-  createGame(command: CreateGameCommand): Observable<Result> {
+  createGame(command: CreateGameCommand): Observable<GameDto> {
     const url = `/games`;
     return this.post(url, command);
   }
 
-  createAnonymousGame(command: CreateAnonymousGameCommand): Observable<Result> {
+  createAnonymousGame(command: CreateAnonymousGameCommand): Observable<GameDto> {
     const url = `/games/anonymous`;
     return this.post(url, command);
   }
