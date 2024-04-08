@@ -4,8 +4,8 @@ import com.silyosbekov.chessmate.engine.util.ArrayUtils;
 import com.silyosbekov.chessmate.model.Game;
 import com.silyosbekov.chessmate.model.GameStatus;
 import com.silyosbekov.chessmate.model.Player;
+import com.silyosbekov.chessmate.model.PlayerColor;
 import org.junit.jupiter.api.Test;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -57,9 +57,9 @@ class GameMapperTest {
         var game = new Game();
         game.setWhitePlayer(new Player());
         game.setBlackPlayer(new Player());
-        game.setWinnerPlayerId(game.getWhitePlayerId());
+        game.setWinnerPlayer(PlayerColor.WHITE);
         game.setStatus(GameStatus.OPEN);
-        game.setCurrentTurn(UUID.randomUUID());
+        game.setCurrentTurn(PlayerColor.WHITE);
 
         // Act
         var result = GameMapper.toDto(game);
@@ -69,9 +69,9 @@ class GameMapperTest {
         assertEquals(game.getId(), result.id());
         assertEquals(game.getWhitePlayer().getId(), result.whitePlayerId());
         assertEquals(game.getBlackPlayer().getId(), result.blackPlayerId());
-        assertEquals(game.getWinnerPlayerId(), result.winnerPlayerId());
+        assertEquals(game.getWinnerPlayer(), result.winnerPlayer());
         assertEquals(game.getStatus().name(), result.status());
-        assertEquals(game.getCurrentTurn(), result.currentTurnPlayerId());
+        assertEquals(game.getCurrentTurn(), result.currentTurnPlayer());
         assertEquals(game.getCreatedDate(), result.createdDate());
     }
 
@@ -90,15 +90,15 @@ class GameMapperTest {
         var game = new Game();
         game.setWhitePlayer(new Player());
         game.setBlackPlayer(new Player());
-        game.setWinnerPlayerId(null);
+        game.setWinnerPlayer(null);
         game.setStatus(GameStatus.OPEN);
-        game.setCurrentTurn(UUID.randomUUID());
+        game.setCurrentTurn(PlayerColor.WHITE);
 
         // Act
         var result = GameMapper.toDto(game);
 
         // Assert
         assertNotNull(result);
-        assertNull(result.winnerPlayerId());
+        assertNull(result.winnerPlayer());
     }
 }
