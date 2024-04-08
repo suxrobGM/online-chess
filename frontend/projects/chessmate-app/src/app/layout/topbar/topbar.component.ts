@@ -4,6 +4,7 @@ import {MenuItem} from 'primeng/api';
 import {MenubarModule} from 'primeng/menubar';
 import {InputTextModule} from 'primeng/inputtext';
 import {ButtonModule} from 'primeng/button';
+import {ApiService, AuthService} from '@chessmate-app/core/services';
 
 
 @Component({
@@ -19,18 +20,26 @@ import {ButtonModule} from 'primeng/button';
   ],
 })
 export class TopbarComponent {
-  public menuItems: MenuItem[];
+  public readonly menuItems: MenuItem[];
   public isSearchInputVisible = false;
 
   @ViewChild('searchInput')
   public searchInputRef!: ElementRef<HTMLInputElement>;
 
-  constructor() {
+  constructor(
+    private readonly authService: AuthService,
+    private readonly apiService: ApiService,
+  ) 
+  {
     this.menuItems = [
       {
         label: 'PLAY',
         items: [
-          { label: 'Create a game', icon: 'bi bi-plus-square' },
+          { 
+            label: 'Create a game',
+            icon: 'bi bi-plus-square',
+            command: () => this.openCreateGameDialog(),
+          },
         ]
       },
       {
@@ -39,11 +48,21 @@ export class TopbarComponent {
     ];
   }
 
-  public toggleSearchInputVisibility() {
+  toggleSearchInputVisibility() {
     this.isSearchInputVisible = !this.isSearchInputVisible;
 
     if (this.isSearchInputVisible) {
       this.searchInputRef.nativeElement.focus();
     }
+  }
+
+  private openCreateGameDialog() {
+    this.createAnonymousGame();
+  }
+
+  private createAnonymousGame() {
+    this.apiService.createAnonymousGame({}).subscribe((game) => {
+      console.log(game);
+    });
   }
 }

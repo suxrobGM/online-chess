@@ -59,7 +59,7 @@ class GameMapperTest {
         game.setBlackPlayer(new Player());
         game.setWinnerPlayerId(game.getWhitePlayerId());
         game.setStatus(GameStatus.OPEN);
-        game.setCurrentTurnPlayerId(UUID.randomUUID());
+        game.setCurrentTurn(UUID.randomUUID());
 
         // Act
         var result = GameMapper.toDto(game);
@@ -71,7 +71,7 @@ class GameMapperTest {
         assertEquals(game.getBlackPlayer().getId(), result.blackPlayerId());
         assertEquals(game.getWinnerPlayerId(), result.winnerPlayerId());
         assertEquals(game.getStatus().name(), result.status());
-        assertEquals(game.getCurrentTurnPlayerId(), result.currentTurnPlayerId());
+        assertEquals(game.getCurrentTurn(), result.currentTurnPlayerId());
         assertEquals(game.getCreatedDate(), result.createdDate());
     }
 
@@ -92,7 +92,7 @@ class GameMapperTest {
         game.setBlackPlayer(new Player());
         game.setWinnerPlayerId(null);
         game.setStatus(GameStatus.OPEN);
-        game.setCurrentTurnPlayerId(UUID.randomUUID());
+        game.setCurrentTurn(UUID.randomUUID());
 
         // Act
         var result = GameMapper.toDto(game);

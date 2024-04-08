@@ -1,17 +1,12 @@
 package com.silyosbekov.chessmate.service;
 
 import com.silyosbekov.chessmate.engine.Pgn;
-import com.silyosbekov.chessmate.model.Game;
-import com.silyosbekov.chessmate.model.GameStatus;
-import com.silyosbekov.chessmate.model.PlayerColor;
+import com.silyosbekov.chessmate.model.*;
 import com.silyosbekov.chessmate.repository.GameRepository;
-import com.silyosbekov.chessmate.model.Player;
 import com.silyosbekov.chessmate.repository.PlayerRepository;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Random;
 import java.util.UUID;
 
 /**
@@ -54,7 +49,6 @@ public class GameService {
      * @param hostPlayerId The ID of the player who will host the game
      * @param hostPlayerColor The color of the host player
      * @throws NoSuchElementException if the host player does not exist
-     * @throws IllegalStateException if the host player ID format is invalid UUID
      * @return The newly created game
      */
     public Game createNewGame(UUID hostPlayerId, PlayerColor hostPlayerColor) {
@@ -76,36 +70,20 @@ public class GameService {
      * Create a new game with a host player
      * @param hostPlayer The player who will host the game
      * @param hostPlayerColor The color of the host player, or null to randomly assign color to the host player
-     * @param anonymousPlayerId The ID of the anonymous player
+     * @param anonymousHostPlayerId The ID of the anonymous player
      * @return The newly created game
      */
-    private Game createGameWithHostPlayer(Player hostPlayer, PlayerColor hostPlayerColor, UUID anonymousPlayerId) {
+    private Game createGameWithHostPlayer(Player hostPlayer, PlayerColor hostPlayerColor, UUID anonymousHostPlayerId) {
         var game = new Game();
+        game.setHostPlayerColor(hostPlayerColor);
+        game.setStatus(GameStatus.OPEN);
 
-        // Randomly assign color if not specified
-        if (hostPlayerColor == null) {
-            hostPlayerColor = new Random().nextBoolean() ? PlayerColor.WHITE : PlayerColor.BLACK;
-        }
-
-        if (hostPlayerColor == PlayerColor.WHITE) {
-            if (hostPlayer != null) {
-                game.setWhitePlayer(hostPlayer);
-            }
-            else {
-                game.setWhiteAnonymousPlayerId(anonymousPlayerId);
-            }
+        if (hostPlayer != null && hostPlayerColor == PlayerColor.WHITE) {
+            game.setHostPlayer(hostPlayer);
         }
         else {
-            if (hostPlayer != null) {
-                game.setBlackPlayer(hostPlayer);
-            }
-            else {
-                game.setBlackAnonymousPlayerId(anonymousPlayerId);
-            }
+            game.setAnonymousHostPlayerId(anonymousHostPlayerId);
         }
-
-        game.setCurrentTurnPlayerId(game.getWhitePlayerId());
-        game.setStatus(GameStatus.OPEN);
 
         var pgn = new Pgn();
         game.setPgn(pgn.toString());
@@ -117,23 +95,19 @@ public class GameService {
      * @param gameId The ID of the game
      * @param playerId The ID of the player whose turn it is
      * @throws NoSuchElementException if the player does not exist in the game
-     * @throws IllegalArgumentException if game ID or player ID format is invalid UUID
      * @return The updated game
      */
-    public Game setCurrentTurnPlayer(String gameId, String playerId) {
-        var gameUUID = UUID.fromString(gameId);
-        var playerUUID = UUID.fromString(playerId);
-
-        var game = gameRepository.findById(gameUUID).orElseThrow();
+    public Game setCurrentTurnPlayer(UUID gameId, UUID playerId) {
+        var game = gameRepository.findById(gameId).orElseThrow();
         var pgn = Pgn.fromString(game.getPgn());
 
-        if (game.getBlackPlayerId().equals(playerUUID)) {
-            game.setCurrentTurnPlayerId(game.getBlackPlayerId());
-            pgn.setBlackTurn();
-        }
-        else if (game.getWhitePlayerId().equals(playerUUID)) {
-            game.setCurrentTurnPlayerId(game.getWhitePlayerId());
+        if (game.getWhitePlayerId().equals(playerId)) {
+            game.setCurrentTurn(PlayerColor.WHITE);
             pgn.setWhiteTurn();
+        }
+        else if (game.getBlackPlayerId().equals(playerId)) {
+            game.setCurrentTurn(PlayerColor.BLACK);
+            pgn.setBlackTurn();
         }
         else {
             throw new NoSuchElementException("Player with '%s' does not exist in the game".formatted(playerId));
@@ -148,22 +122,18 @@ public class GameService {
      * @param gameId The ID of the game to resign from
      * @param playerId The ID of the player who is resigning
      * @throws NoSuchElementException if the game does not exist or if the player does not exist in the game
-     * @throws IllegalArgumentException if game ID or player ID format is invalid UUID
      * @return The updated game
      */
-    public Game resignGame(String gameId, String playerId) {
-        var gameUUID = UUID.fromString(gameId);
-        var playerUUID = UUID.fromString(playerId);
-
-        var game = gameRepository.findById(gameUUID).orElseThrow();
+    public Game resignGame(UUID gameId, UUID playerId) {
+        var game = gameRepository.findById(gameId).orElseThrow();
         var pgn = Pgn.fromString(game.getPgn());
 
-        if (game.getWhitePlayerId().equals(playerUUID)) { // White player resigned
-            game.setWinnerPlayerId(game.getBlackPlayerId()); // Black player wins
+        if (game.getWhitePlayerId().equals(playerId)) { // White player resigned
+            game.setWinnerPlayer(PlayerColor.WHITE); // Black player wins
             pgn.setBlackWinResult();
         }
-        else if (game.getBlackPlayerId().equals(playerUUID)) { // Black player resigned
-            game.setWinnerPlayerId(game.getWhitePlayerId()); // White player wins
+        else if (game.getBlackPlayerId().equals(playerId)) { // Black player resigned
+            game.setWinnerPlayer(PlayerColor.BLACK); // White player wins
             pgn.setWhiteWinResult();
         }
         else {
@@ -179,13 +149,10 @@ public class GameService {
      * Draw a game
      * @param gameId The ID of the game to draw
      * @throws NoSuchElementException if the game does not exist
-     * @throws IllegalArgumentException if game ID format is invalid UUID
      * @return The updated game
      */
-    public Game drawGame(String gameId) {
-        var gameUUID = UUID.fromString(gameId);
-
-        var game = gameRepository.findById(gameUUID).orElseThrow();
+    public Game drawGame(UUID gameId) {
+        var game = gameRepository.findById(gameId).orElseThrow();
         var pgn = Pgn.fromString(game.getPgn());
         pgn.setDrawResult();
 
@@ -198,13 +165,10 @@ public class GameService {
      * Abort a game
      * @param gameId The ID of the game to abort
      * @throws NoSuchElementException if the game does not exist
-     * @throws IllegalArgumentException if game ID format is invalid UUID
      * @return The updated game
      */
-    public Game abortGame(String gameId) {
-        var gameUUID = UUID.fromString(gameId);
-
-        var game = gameRepository.findById(gameUUID).orElseThrow();
+    public Game abortGame(UUID gameId) {
+        var game = gameRepository.findById(gameId).orElseThrow();
         game.setStatus(GameStatus.ABORTED);
         return gameRepository.save(game);
     }

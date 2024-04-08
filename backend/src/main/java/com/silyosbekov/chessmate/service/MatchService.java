@@ -7,6 +7,7 @@ import com.silyosbekov.chessmate.engine.Pgn;
 import com.silyosbekov.chessmate.engine.option.MoveOptions;
 import com.silyosbekov.chessmate.model.Game;
 import com.silyosbekov.chessmate.model.GameStatus;
+import com.silyosbekov.chessmate.model.Player;
 import com.silyosbekov.chessmate.model.PlayerColor;
 import com.silyosbekov.chessmate.repository.GameRepository;
 import com.silyosbekov.chessmate.repository.PlayerRepository;
@@ -23,57 +24,99 @@ public class MatchService {
      */
     private final Map<UUID, Pair<Game, Chess>> activeGames = new HashMap<>();
 
-    public MatchService(
-            GameRepository gameRepository,
-            PlayerRepository playerRepository
-    )
-    {
+    public MatchService(GameRepository gameRepository, PlayerRepository playerRepository) {
         this.gameRepository = gameRepository;
         this.playerRepository = playerRepository;
     }
 
+    /**
+     * Join a game with a player.
+     * @param gameId The ID of the game to join
+     * @param playerId The ID of the player joining the game
+     * @return The updated game
+     */
     public Game joinGame(UUID gameId, UUID playerId) {
         var game = gameRepository.findById(gameId).orElseThrow();
         var player = playerRepository.findById(playerId).orElseThrow();
-        return joinGameCommon(game, gameId, player.getUsername(), playerId);
+        return joinGameCommon(game, playerId, player);
     }
 
+    /**
+     * Join an anonymous game with a player.
+     * @param gameId The ID of the game to join
+     * @param playerId The ID of the player joining the game
+     * @return The updated game
+     */
     public Game joinAnonymousGame(UUID gameId, UUID playerId) {
         var game = gameRepository.findById(gameId).orElseThrow();
-        return joinGameCommon(game, gameId, "Anonymous", playerId);
+        return joinGameCommon(game, playerId, null);
     }
 
-    private Game joinGameCommon(Game game, UUID gameId, String playerName, UUID playerId) {
+    /**
+     * Join a game with a player.
+     * @param game The game to join
+     * @param playerId The joining player's ID
+     * @param player The joining player entity. Set to null if the player is anonymous
+     * @return The updated game
+     */
+    private Game joinGameCommon(Game game, UUID playerId, Player player) {
         if (game.isFull()) {
             throw new IllegalStateException("Game is already full");
         }
 
-        PlayerColor playerColor;
+        var secondPlayerColor = determineSecondPlayerColor(game);
+        var secondPlayerName = player == null ? "Anonymous" : player.getUsername();
 
-        if (playerName.equals("Anonymous")) {
-            playerColor = game.setAnonymousPlayer(playerId);
+        if (secondPlayerColor == PlayerColor.WHITE) {
+            if (secondPlayerName.equals("Anonymous")) {
+                game.setWhiteAnonymousPlayerId(playerId);
+            }
+            else {
+                game.setWhitePlayer(player);
+            }
         }
         else {
-            var player = playerRepository.findById(playerId).orElseThrow();
-            playerColor = game.setPlayer(player);
+            if (secondPlayerName.equals("Anonymous")) {
+                game.setBlackAnonymousPlayerId(playerId);
+            }
+            else {
+                game.setBlackPlayer(player);
+            }
         }
 
         game.setStatus(GameStatus.ONGOING);
 
+        // Set the player's color in the PGN
         var pgn = Pgn.fromString(game.getPgn());
 
-        if (playerColor == PlayerColor.WHITE) {
-            pgn.setWhitePlayer(playerName);
-            pgn.setWhiteTurn();
+        if (secondPlayerColor == PlayerColor.WHITE) {
+            pgn.setWhitePlayer(secondPlayerName);
         }
         else {
-            pgn.setBlackPlayer(playerName);
-            pgn.setBlackTurn();
+            pgn.setBlackPlayer(secondPlayerName);
         }
 
+        pgn.setWhiteTurn();
         game.setPgn(pgn.toString());
-        activeGames.put(gameId, Pair.of(game, new Chess()));
+        activeGames.put(game.getId(), Pair.of(game, new Chess()));
         return gameRepository.save(game);
+    }
+
+    /**
+     * Determine the color of the second player in the game.
+     * If the host player color is not set, the color is randomly assigned.
+     * @param game The game to determine the color for
+     * @return The color of the second player
+     */
+    private PlayerColor determineSecondPlayerColor(Game game) {
+        if (game.getHostPlayerColor() == null) {
+            var isWhite = new Random().nextBoolean();
+            game.setHostPlayerColor(isWhite ? PlayerColor.BLACK : PlayerColor.WHITE);
+            return isWhite ? PlayerColor.WHITE : PlayerColor.BLACK;
+        }
+        else {
+            return game.getHostPlayerColor() == PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE;
+        }
     }
 
     public Game leaveGame(UUID gameId, UUID playerId) {
@@ -110,11 +153,11 @@ public class MatchService {
         var pgn = Pgn.fromString(game.getPgn());
 
         if (winnerPlayerId.equals(game.getWhitePlayerId())){
-            game.setWinnerPlayerId(winnerPlayerId);
+            game.setWinnerPlayer(PlayerColor.WHITE);
             pgn.setWhiteWinResult();
         }
         else if (winnerPlayerId.equals(game.getBlackPlayerId())) {
-            game.setWinnerPlayerId(winnerPlayerId);
+            game.setWinnerPlayer(PlayerColor.BLACK);
             pgn.setBlackWinResult();
         }
         else {

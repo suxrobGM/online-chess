@@ -1,5 +1,6 @@
 package com.silyosbekov.chessmate.model;
 
+import com.silyosbekov.chessmate.constant.GameConst;
 import jakarta.persistence.*;
 import java.util.UUID;
 
@@ -10,25 +11,66 @@ import java.util.UUID;
 @Entity
 @Table(name = "games")
 public class Game extends AuditableEntity {
+    /**
+     * The player who hosts the game.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "host_player_id")
+    private Player hostPlayer;
+
+    /**
+     * The anonymous player's id who hosts the game.
+     */
+    @Column(name = "anonymous_host_player_id")
+    private UUID anonymousHostPlayerId;
+
+    /**
+     * The color of the host player in the game.
+     * If the host player is not set, the color is null.
+     * It means that color will be assigned randomly when second player joins the game.
+     */
+    @Column(name = "host_player_color")
+    private PlayerColor hostPlayerColor;
+
+    /**
+     * The player who plays as white.
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "white_player_id")
     private Player whitePlayer;
 
+    /**
+     * The anonymous player's id who plays as white.
+     */
     @Column(name = "white_anonymous_player_id")
     private UUID whiteAnonymousPlayerId;
 
+    /**
+     * The player who plays as black.
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "black_player_id")
     private Player blackPlayer;
 
+    /**
+     * The anonymous player's id who plays as black.
+     */
     @Column(name = "black_anonymous_player_id")
     private UUID blackAnonymousPlayerId;
 
-    @Column(name = "winner_player_id")
-    private UUID winnerPlayerId;
+    /**
+     * The color of the player who won the game.
+     * If the game is not finished yet, the winner player is null.
+     */
+    @Column(name = "winner_player")
+    private PlayerColor winnerPlayer;
 
-    @Column(name = "current_turn_player_id", nullable = false)
-    private UUID currentTurnPlayerId;
+    /**
+     * The player color who has the current turn in the game.
+     * If game is not started yet, the current turn is null.
+     */
+    @Column(name = "current_turn")
+    private PlayerColor currentTurn;
 
     @Column(name = "is_timer_enabled")
     private boolean isTimerEnabled = false;
@@ -59,12 +101,12 @@ public class Game extends AuditableEntity {
         this.blackPlayer = setBlackPlayer;
     }
 
-    public UUID getCurrentTurnPlayerId() {
-        return currentTurnPlayerId;
+    public PlayerColor getCurrentTurn() {
+        return currentTurn;
     }
 
-    public void setCurrentTurnPlayerId(UUID currentTurnPlayerId) {
-        this.currentTurnPlayerId = currentTurnPlayerId;
+    public void setCurrentTurn(PlayerColor currentTurn) {
+        this.currentTurn = currentTurn;
     }
 
     public GameStatus getStatus() {
@@ -75,12 +117,12 @@ public class Game extends AuditableEntity {
         this.status = status;
     }
 
-    public UUID getWinnerPlayerId() {
-        return winnerPlayerId;
+    public PlayerColor getWinnerPlayer() {
+        return winnerPlayer;
     }
 
-    public void setWinnerPlayerId(UUID winnerPlayerId) {
-        this.winnerPlayerId = winnerPlayerId;
+    public void setWinnerPlayer(PlayerColor winnerPlayerColor) {
+        this.winnerPlayer = winnerPlayerColor;
     }
 
     public String getPgn() {
@@ -143,49 +185,47 @@ public class Game extends AuditableEntity {
         return whitePlayer != null && blackPlayer != null;
     }
 
-    /**
-     * Sets the player to the game. If the game is full, the player is not added.
-     * If added player is white, sets the current turn player to white. Otherwise, sets it to black.
-     * @param player The player to add
-     * @return The color of the player in the game, or null if the game is full.
-     */
-    public PlayerColor setPlayer(Player player) {
-        if (isFull()) {
-            return null;
-        }
-
-        if (whitePlayer == null) {
-            whitePlayer = player;
-            setCurrentTurnPlayerId(whitePlayer.getId());
-            return PlayerColor.WHITE;
-        }
-        else {
-            blackPlayer = player;
-            setCurrentTurnPlayerId(blackPlayer.getId());
-            return PlayerColor.BLACK;
-        }
+    public PlayerColor getHostPlayerColor() {
+        return hostPlayerColor;
     }
 
-    /**
-     * Sets the anonymous player to the game. If the game is full, the player is not added.
-     * If added player is white, sets the current turn player to white. Otherwise, sets it to black.
-     * @param playerId The player's id to add
-     * @return The color of the player in the game, or null if the game is full.
-     */
-    public PlayerColor setAnonymousPlayer(UUID playerId) {
-        if (isFull()) {
-            return null;
-        }
+    public void setHostPlayerColor(PlayerColor hostPlayerColor) {
+        this.hostPlayerColor = hostPlayerColor;
+    }
 
-        if (whitePlayer == null) {
-            whiteAnonymousPlayerId = playerId;
-            setCurrentTurnPlayerId(whiteAnonymousPlayerId);
-            return PlayerColor.WHITE;
-        }
-        else {
-            blackAnonymousPlayerId = playerId;
-            setCurrentTurnPlayerId(blackAnonymousPlayerId);
-            return PlayerColor.BLACK;
-        }
+    public Player getHostPlayer() {
+        return hostPlayer;
+    }
+
+    public void setHostPlayer(Player hostPlayer) {
+        this.hostPlayer = hostPlayer;
+    }
+
+    public UUID getAnonymousHostPlayerId() {
+        return anonymousHostPlayerId;
+    }
+
+    public void setAnonymousHostPlayerId(UUID anonymousHostPlayerId) {
+        this.anonymousHostPlayerId = anonymousHostPlayerId;
+    }
+
+    public UUID getHostPlayerId() {
+        return hostPlayer != null ? hostPlayer.getId() : anonymousHostPlayerId;
+    }
+
+    public String getHostPlayerUsername() {
+        return hostPlayer != null ? hostPlayer.getUsername() : "Anonymous";
+    }
+
+    public int getHostPlayerElo() {
+        return hostPlayer != null ? hostPlayer.getElo() : GameConst.DEFAULT_ELO;
+    }
+
+    public int getWhitePlayerElo() {
+        return whitePlayer != null ? whitePlayer.getElo() : GameConst.DEFAULT_ELO;
+    }
+
+    public int getBlackPlayerElo() {
+        return blackPlayer != null ? blackPlayer.getElo() : GameConst.DEFAULT_ELO;
     }
 }

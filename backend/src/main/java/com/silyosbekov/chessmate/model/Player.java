@@ -1,5 +1,6 @@
 package com.silyosbekov.chessmate.model;
 
+import com.silyosbekov.chessmate.constant.GameConst;
 import jakarta.persistence.*;
 
 /**
@@ -21,7 +22,7 @@ public class Player extends AuditableEntity {
     private String email;
 
     @Column()
-    private int elo = 1200; // Default ELO rating
+    private int elo = GameConst.DEFAULT_ELO;
 
     public String getFirstName() {
         return firstName;
