@@ -10,13 +10,16 @@
     </div>
     
     <div class="color-submits">
-      <button type="button" class="btn color-submits__button" (click)="setBlackHostColor()">
+      <button type="button" class="btn color-submits__button" [pTooltip]="'Black color'" [tooltipPosition]="'bottom'"
+        (click)="setBlackHostColor()">
         <i style="background-image: url('/assets/colors/black-piece.svg');"></i>
       </button>
-      <button type="button" class="btn color-submits__button random" (click)="setRandomHostColor()">
+      <button type="button" class="btn color-submits__button random" [pTooltip]="'Random color'"
+        [tooltipPosition]="'bottom'" (click)="setRandomHostColor()">
         <i style="background-image: url('/assets/colors/random-piece.svg');"></i>
       </button>
-      <button type="button" class="btn color-submits__button" (click)="setWhiteHostColor()">
+      <button type="button" class="btn color-submits__button" [pTooltip]="'White color'" [tooltipPosition]="'bottom'"
+        (click)="setWhiteHostColor()">
         <i style="background-image: url('/assets/colors/white-piece.svg');"></i>
       </button>
     </div>

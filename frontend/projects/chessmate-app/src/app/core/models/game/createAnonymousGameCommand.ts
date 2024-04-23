@@ -2,5 +2,5 @@ import {PlayerColor} from '../playerColor';
 
 export interface CreateAnonymousGameCommand {
   hostPlayerId: string;
-  hostPlayerColor?: PlayerColor;
+  hostPlayerColor?: PlayerColor | null;
 }

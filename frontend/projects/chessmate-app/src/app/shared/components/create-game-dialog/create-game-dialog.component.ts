@@ -3,8 +3,13 @@ import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {DialogModule} from 'primeng/dialog';
 import {DropdownModule} from 'primeng/dropdown';
 import {ButtonModule} from 'primeng/button';
+import {TooltipModule} from 'primeng/tooltip';
 import {ApiService, AuthService, PlayerService} from '@chessmate-app/core/services';
-import { PlayerColor } from '@chessmate-app/core/models';
+import {
+  CreateAnonymousGameCommand,
+  CreateGameCommand,
+  PlayerColor,
+} from '@chessmate-app/core/models';
 
 
 @Component({
@@ -16,7 +21,8 @@ import { PlayerColor } from '@chessmate-app/core/models';
     DialogModule,
     DropdownModule,
     ReactiveFormsModule,
-    ButtonModule
+    ButtonModule,
+    TooltipModule,
   ],
 })
 export class CreateGameDialogComponent {
@@ -88,7 +94,12 @@ export class CreateGameDialogComponent {
   }
 
   private createAnonymousGame() {
-    this.apiService.createAnonymousGame({hostPlayerId: this.playerService.getPlayerId()}).subscribe((game) => {
+    const command: CreateAnonymousGameCommand = {
+      hostPlayerId: this.playerService.getPlayerId(),
+      hostPlayerColor: this.form.controls.hostColor.value,
+    };
+
+    this.apiService.createAnonymousGame(command).subscribe((game) => {
       this.isLoading = false;
       this.hide();
       console.log(game);
@@ -96,7 +107,12 @@ export class CreateGameDialogComponent {
   }
 
   private createAuthenticatedGame() {
-    this.apiService.createGame({hostPlayerId: this.playerService.getPlayerId()}).subscribe((game) => {
+    const command: CreateGameCommand = {
+      hostPlayerId: this.playerService.getPlayerId(),
+      hostPlayerColor: this.form.controls.hostColor.value,
+    };
+
+    this.apiService.createGame(command).subscribe((game) => {
       this.isLoading = false;
       this.hide();
       console.log(game);
@@ -108,5 +124,5 @@ interface CreateGameForm {
   timeControl: FormControl<string>;
   gameType: FormControl<string>;
   ratingRange: FormControl<string>;
-  hostColor: FormControl<number | null>;
+  hostColor: FormControl<PlayerColor | null>;
 }
