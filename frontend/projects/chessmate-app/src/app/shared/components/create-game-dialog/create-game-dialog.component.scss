@@ -1,0 +1,44 @@
+.color-submits {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: flex-end;
+  justify-content: center;
+  margin: 1em auto;
+  text-align: center;
+}
+
+.color-submits__button {
+  margin: 0 .5em;
+  width: 64px;
+  height: 64px;
+  padding: 7px;
+  background: linear-gradient(to bottom, hsl(37, 7%, 22%), hsl(37, 5%, 19%) 100%);
+  border-radius: 5px;
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, .225);
+}
+
+.color-submits__button:hover {
+  background: linear-gradient(to bottom, hsl(37, 7%, 25%), hsl(37, 5%, 22%) 100%);
+  color: #ccc;
+
+}
+
+.color-submits__button i {
+  display: block;
+  padding: 0;
+  width: 50px;
+  height: 50px;
+  background-size: 50px 50px;
+}
+
+.color-submits__button.random {
+  width: 85px;
+  height: 85px;
+  padding: 10px;
+}
+
+.color-submits__button.random i {
+  background-size: 65px 65px;
+  width: 65px;
+  height: 65px;
+}

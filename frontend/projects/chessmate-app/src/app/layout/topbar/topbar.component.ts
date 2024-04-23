@@ -4,7 +4,7 @@ import {MenuItem} from 'primeng/api';
 import {MenubarModule} from 'primeng/menubar';
 import {InputTextModule} from 'primeng/inputtext';
 import {ButtonModule} from 'primeng/button';
-import {ApiService, AuthService} from '@chessmate-app/core/services';
+import {CreateGameDialogComponent} from '@chessmate-app/shared/components';
 
 
 @Component({
@@ -16,21 +16,19 @@ import {ApiService, AuthService} from '@chessmate-app/core/services';
     MenubarModule,
     InputTextModule,
     ButtonModule,
-    NgClass
+    NgClass,
+    CreateGameDialogComponent,
   ],
 })
 export class TopbarComponent {
   public readonly menuItems: MenuItem[];
-  public isSearchInputVisible = false;
+  public searchInputVisible = false;
+  public createGameDialogVisible = false;
 
   @ViewChild('searchInput')
   public searchInputRef!: ElementRef<HTMLInputElement>;
 
-  constructor(
-    private readonly authService: AuthService,
-    private readonly apiService: ApiService,
-  ) 
-  {
+  constructor() {
     this.menuItems = [
       {
         label: 'PLAY',
@@ -49,20 +47,14 @@ export class TopbarComponent {
   }
 
   toggleSearchInputVisibility() {
-    this.isSearchInputVisible = !this.isSearchInputVisible;
+    this.searchInputVisible = !this.searchInputVisible;
 
-    if (this.isSearchInputVisible) {
+    if (this.searchInputVisible) {
       this.searchInputRef.nativeElement.focus();
     }
   }
 
   private openCreateGameDialog() {
-    this.createAnonymousGame();
-  }
-
-  private createAnonymousGame() {
-    this.apiService.createAnonymousGame({}).subscribe((game) => {
-      console.log(game);
-    });
+    this.createGameDialogVisible = true;
   }
 }

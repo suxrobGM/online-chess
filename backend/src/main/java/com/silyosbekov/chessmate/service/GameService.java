@@ -61,8 +61,7 @@ public class GameService {
      * @param hostPlayerColor The color of the host player
      * @return The newly created game
      */
-    public Game createNewAnonymousGame(PlayerColor hostPlayerColor) {
-        var hostPlayerId = UUID.randomUUID(); // Generate UUID for anonymous player
+    public Game createNewAnonymousGame(UUID hostPlayerId, PlayerColor hostPlayerColor) {
         return createGameWithHostPlayer(null, hostPlayerColor, hostPlayerId);
     }
 

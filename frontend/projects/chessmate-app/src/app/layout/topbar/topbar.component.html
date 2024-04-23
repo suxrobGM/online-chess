@@ -14,10 +14,12 @@
       pInputText 
       class="search-input" 
       placeholder="Search"  
-      [ngClass]="{'minimized': !isSearchInputVisible}"
+      [ngClass]="{'minimized': !searchInputVisible}"
       (focusout)="toggleSearchInputVisibility()">
       
     <p-button icon="bi bi-gear" [text]="true" [rounded]="true"></p-button>
     <p-button label="SIGN IN"></p-button>
   </ng-template>
 </p-menubar>
+
+<app-create-game-dialog [(visible)]="createGameDialogVisible"></app-create-game-dialog>

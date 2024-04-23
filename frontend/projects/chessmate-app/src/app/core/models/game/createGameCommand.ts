@@ -1,6 +1,6 @@
 import {PlayerColor} from '../playerColor';
 
 export interface CreateGameCommand {
-  hostPlayerId?: string;
+  hostPlayerId: string;
   hostPlayerColor?: PlayerColor;
 }

@@ -62,7 +62,7 @@ public class GameController {
      */
     @PostMapping("/api/games/anonymous")
     public ResponseEntity<GameDto> createAnonymousGame(@RequestBody CreateAnonymousGameCommand command) {
-        var game = gameService.createNewAnonymousGame(command.hostPlayerColor());
+        var game = gameService.createNewAnonymousGame(command.hostPlayerId(), command.hostPlayerColor());
         var gameDto = GameMapper.toDto(game);
         return ResponseEntity.ok(gameDto);
     }
