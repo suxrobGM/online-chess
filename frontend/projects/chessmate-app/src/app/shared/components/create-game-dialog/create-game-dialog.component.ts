@@ -4,6 +4,7 @@ import {DialogModule} from 'primeng/dialog';
 import {DropdownModule} from 'primeng/dropdown';
 import {ButtonModule} from 'primeng/button';
 import {TooltipModule} from 'primeng/tooltip';
+import {ProgressSpinnerModule} from 'primeng/progressspinner';
 import {ApiService, AuthService, PlayerService} from '@chessmate-app/core/services';
 import {
   CreateAnonymousGameCommand,
@@ -23,6 +24,7 @@ import {
     ReactiveFormsModule,
     ButtonModule,
     TooltipModule,
+    ProgressSpinnerModule,
   ],
 })
 export class CreateGameDialogComponent {
@@ -47,7 +49,7 @@ export class CreateGameDialogComponent {
       timeControl: new FormControl('Unlimited', {nonNullable: true}),
       gameType: new FormControl('Casual', {nonNullable: true}),
       ratingRange: new FormControl('', {nonNullable: true}),
-      hostColor: new FormControl(null, {nonNullable: false}),
+      hostColor: new FormControl(null, {nonNullable: false}), // null means random color
     });
   }
 
@@ -101,7 +103,6 @@ export class CreateGameDialogComponent {
 
     this.apiService.createAnonymousGame(command).subscribe((game) => {
       this.isLoading = false;
-      this.hide();
       console.log(game);
     });
   }
@@ -114,7 +115,6 @@ export class CreateGameDialogComponent {
 
     this.apiService.createGame(command).subscribe((game) => {
       this.isLoading = false;
-      this.hide();
       console.log(game);
     });
   }

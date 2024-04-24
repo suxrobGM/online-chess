@@ -1,7 +1,7 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
 import {ToastModule} from 'primeng/toast';
-import {AuthService, ThemeService} from '@chessmate-app/core/services';
+import {AuthService, MatchService, ThemeService} from '@chessmate-app/core/services';
 import {TopbarComponent} from '@chessmate-app/layout';
 
 @Component({
@@ -14,13 +14,19 @@ import {TopbarComponent} from '@chessmate-app/layout';
     ToastModule,
   ],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   constructor(
     //private readonly authService: AuthService,
+    private readonly matchService: MatchService,
     private readonly themeService: ThemeService,
   )
   {
     this.themeService.applyThemeFromStorage();
+  }
+
+  ngOnInit(): void {
+    // Connect to the WebSocket server when the app starts.
+    this.matchService.connect();
   }
 
   // isAuthenticated(): boolean {

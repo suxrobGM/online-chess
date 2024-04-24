@@ -1,7 +1,7 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {TableLazyLoadEvent, TableModule} from 'primeng/table';
 import {ButtonModule} from 'primeng/button';
-import {GameDto, GetGamesQuery, PlayerColor} from '@chessmate-app/core/models';
+import {GameDto, GameStatus, GetGamesQuery, PlayerColor} from '@chessmate-app/core/models';
 import {ApiService, MatchService} from '@chessmate-app/core/services';
 import {SortUtils} from '@chessmate-app/shared/utils';
 
@@ -16,7 +16,7 @@ import {SortUtils} from '@chessmate-app/shared/utils';
     ButtonModule,
   ],
 })
-export class LobbyComponent implements OnInit {
+export class LobbyComponent {
   public isLoading = true;
   public totalRecords = 0;
   public first = 0;
@@ -26,10 +26,6 @@ export class LobbyComponent implements OnInit {
     private readonly apiService: ApiService,
     private readonly matchService: MatchService)
   {
-  }
-
-  ngOnInit(): void {
-    this.matchService.connect();
   }
 
   loadGames(event: TableLazyLoadEvent) {
@@ -42,6 +38,7 @@ export class LobbyComponent implements OnInit {
       orderBy: sortField, 
       page: page, 
       pageSize: rows,
+      gameStatus: GameStatus.OPEN,
     };
 
     this.apiService.getGames(query).subscribe((result) => {

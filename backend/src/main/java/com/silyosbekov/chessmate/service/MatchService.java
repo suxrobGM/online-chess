@@ -99,7 +99,7 @@ public class MatchService {
         pgn.setWhiteTurn();
         game.setPgn(pgn.toString());
         // activeGames.put(game.getId(), Pair.of(game, new Chess()));
-        activeGames.put(game.getId(), Pair.of(game, null));
+        activeGames.put(game.getId(), Pair.of(game, new Chess()));
         return gameRepository.save(game);
     }
 
@@ -177,16 +177,18 @@ public class MatchService {
             throw new NoSuchElementException("Game with ID '%s' does not exist".formatted(gameId));
         }
 
-        // TODO: Fix move validation
-//        var move = activeGame.item2().move(new MoveOptions(from, to, null, null, true));
-//
-//        if (move == null) {
-//            throw new IllegalArgumentException("Invalid move");
-//        }
+        var move = activeGame.item2().move(new MoveOptions(from, to, null, null, true));
 
-        var moveSan = from + to;
-        var pgn = Pgn.fromString(activeGame.item1().getPgn());
+        if (move == null) {
+            throw new IllegalArgumentException("Invalid move");
+        }
+
+        var whitePlayerId = activeGame.item1().getWhitePlayerId();
+        var blackPlayerId = activeGame.item1().getBlackPlayerId();
+
+        // var moveSan = from + to;
+        // var pgn = Pgn.fromString(activeGame.item1().getPgn());
         // return new MoveDto(gameId, from, to, moveSan, activeGame.item2().pgn());
-        return new MoveDto(gameId, from, to, moveSan, activeGame.item1().getPgn());
+        return new MoveDto(gameId, whitePlayerId, blackPlayerId, from, to, move.getSan(), activeGame.item1().getPgn());
     }
 }

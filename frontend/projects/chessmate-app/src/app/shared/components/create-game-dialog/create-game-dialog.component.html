@@ -1,4 +1,12 @@
 <p-dialog header="Create game" [(visible)]="visible" [closable]="true" [modal]="true">
+
+  @if (isLoading) {
+    <div class="d-flex justify-content-center">
+      <span class="text-center">Waiting for a player to join</span>
+      <p-progressSpinner></p-progressSpinner>
+    </div>
+  }
+
   <form [formGroup]="form" (ngSubmit)="createGame()">
     <div class="mb-3 d-flex flex-column">
       <label for="timeControl" class="form-label">Time Control</label>

@@ -66,7 +66,8 @@ public final class FenValidation {
                     }
                     sumFields += Character.getNumericValue(c);
                     previousWasNumber = true;
-                } else {
+                }
+                else {
                     if (!Pattern.matches("^[prnbqkPRNBQK]$", String.valueOf(c))) {
                         return error("Invalid FEN: piece data is invalid (invalid piece)");
                     }
@@ -82,8 +83,8 @@ public final class FenValidation {
 
         // 9th criterion: is en-passant square legal?
         if (
-            (tokens[3].charAt(1) == '3' && tokens[1].equals("w")) ||
-            (tokens[3].charAt(1) == '6' && tokens[1].equals("b"))
+            (tokens[3].charAt(0) == '3' && tokens[1].equals("w")) ||
+            (tokens[3].charAt(0) == '6' && tokens[1].equals("b"))
         )
         {
             return error("Invalid FEN: illegal en-passant square");
