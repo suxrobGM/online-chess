@@ -38,6 +38,18 @@ public class MatchController {
     }
 
     /**
+     * Starts a new anonymous game match.
+     * @param command contains information necessary to start a new game, such as player IDs.
+     * @return The game DTO.
+     */
+    @MessageMapping("/match/joinAnonymous")
+    @SendTo("/topic/match.join")
+    public GameDto joinAnonymousGame(JoinGameCommand command) {
+        var game = matchService.joinAnonymousGame(command.gameId(), command.playerId());
+        return GameMapper.toDto(game);
+    }
+
+    /**
      * Ends the current game match.
      * @param command contains information necessary to end the game, such as player IDs.
      */

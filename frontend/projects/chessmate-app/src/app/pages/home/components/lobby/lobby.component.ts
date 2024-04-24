@@ -1,7 +1,8 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {TableLazyLoadEvent, TableModule} from 'primeng/table';
-import {GameDto, GetGamesQuery} from '@chessmate-app/core/models';
-import {ApiService} from '@chessmate-app/core/services';
+import {ButtonModule} from 'primeng/button';
+import {GameDto, GetGamesQuery, PlayerColor} from '@chessmate-app/core/models';
+import {ApiService, MatchService} from '@chessmate-app/core/services';
 import {SortUtils} from '@chessmate-app/shared/utils';
 
 
@@ -12,15 +13,23 @@ import {SortUtils} from '@chessmate-app/shared/utils';
   styleUrl: './lobby.component.scss',
   imports: [
     TableModule,
+    ButtonModule,
   ],
 })
-export class LobbyComponent {
+export class LobbyComponent implements OnInit {
   public isLoading = true;
   public totalRecords = 0;
   public first = 0;
   public openGames: GameDto[] = [];
 
-  constructor(private readonly apiService: ApiService) {
+  constructor(
+    private readonly apiService: ApiService,
+    private readonly matchService: MatchService)
+  {
+  }
+
+  ngOnInit(): void {
+    this.matchService.connect();
   }
 
   loadGames(event: TableLazyLoadEvent) {
@@ -44,6 +53,19 @@ export class LobbyComponent {
     });
   }
 
-  joinGame(gameId: string): void {
+  joinGame(game: GameDto): void {
+    const isAnonymousGame = game.hostPlayerUsername === 'Anonymous';
+    this.matchService.joinGame(game.id, isAnonymousGame);
+  }
+
+  getHostColor(game: GameDto): string {
+    if (game.hostPlayerColor === PlayerColor.WHITE) {
+      return 'White';
+    }
+    else if (game.hostPlayerColor === PlayerColor.BLACK) {
+      return 'Black';
+    }
+
+    return 'Random';
   }
 }

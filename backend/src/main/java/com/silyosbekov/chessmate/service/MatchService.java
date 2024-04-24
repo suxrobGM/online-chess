@@ -98,7 +98,8 @@ public class MatchService {
 
         pgn.setWhiteTurn();
         game.setPgn(pgn.toString());
-        activeGames.put(game.getId(), Pair.of(game, new Chess()));
+        // activeGames.put(game.getId(), Pair.of(game, new Chess()));
+        activeGames.put(game.getId(), Pair.of(game, null));
         return gameRepository.save(game);
     }
 
@@ -176,12 +177,16 @@ public class MatchService {
             throw new NoSuchElementException("Game with ID '%s' does not exist".formatted(gameId));
         }
 
-        var move = activeGame.item2().move(new MoveOptions(from, to, null, null, true));
+        // TODO: Fix move validation
+//        var move = activeGame.item2().move(new MoveOptions(from, to, null, null, true));
+//
+//        if (move == null) {
+//            throw new IllegalArgumentException("Invalid move");
+//        }
 
-        if (move == null) {
-            throw new IllegalArgumentException("Invalid move");
-        }
-
-        return new MoveDto(gameId, from, to, move.getSan(), activeGame.item2().pgn());
+        var moveSan = from + to;
+        var pgn = Pgn.fromString(activeGame.item1().getPgn());
+        // return new MoveDto(gameId, from, to, moveSan, activeGame.item2().pgn());
+        return new MoveDto(gameId, from, to, moveSan, activeGame.item1().getPgn());
     }
 }

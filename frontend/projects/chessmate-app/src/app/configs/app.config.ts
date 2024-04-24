@@ -1,4 +1,4 @@
 export const APP_CONFIG = {
   apiUrl: 'http://localhost:8000/api',
-  wsUrl: 'ws://localhost:8000/ws',
+  wsUrl: 'ws://127.0.0.1:8000/ws',
 };

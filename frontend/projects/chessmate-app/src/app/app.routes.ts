@@ -13,6 +13,10 @@ export const AppRoutes: Routes = [
     loadChildren: () => import('./pages/home').then(m => m.HomeRoutes),
   },
   {
+    path: 'game',
+    loadChildren: () => import('./pages/game').then(m => m.GameRoutes),
+  },
+  {
     path: 'unauthorized',
     component: UnauthorizedComponent,
   },

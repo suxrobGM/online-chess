@@ -62,6 +62,11 @@ export class ApiService {
     return this.post(url, command);
   }
 
+  // joinGame(gameId: string): Observable<GameDto> {
+  //   const url = `/games/${gameId}/join`;
+  //   return this.post(url, {});
+  // }
+
   // updateClient(command: UpdateClientCommand): Observable<Result> {
   //   const url = `/clients/${command.id}`;
   //   return this.put(url, command);
