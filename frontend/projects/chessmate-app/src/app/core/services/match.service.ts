@@ -4,7 +4,10 @@ import {RxStomp} from '@stomp/rx-stomp';
 import {APP_CONFIG} from '@chessmate-app/configs';
 import {Subject} from 'rxjs';
 import {
+  CancelGameCommand,
   ConnectPlayerCommand,
+  CreateAnonymousGameCommand,
+  CreateGameCommand,
   GameDto,
   JoinGameCommand,
 } from '@chessmate-app/core/models';
@@ -15,8 +18,10 @@ import {PlayerService} from './player.service';
 export class MatchService {
   private readonly stomp: RxStomp;
   private readonly baseUrl = APP_CONFIG.wsUrl;
-  private readonly newGameCreated = new Subject<GameDto>();
-  public readonly newGameCreated$ = this.newGameCreated.asObservable();
+  private readonly gameAdded = new Subject<GameDto>();
+  private readonly gameRemoved = new Subject<GameDto>();
+  public readonly gameAdded$ = this.gameAdded.asObservable();
+  public readonly gameRemoved$ = this.gameRemoved.asObservable();
 
   constructor(
     private readonly playerService: PlayerService,
@@ -45,14 +50,31 @@ export class MatchService {
       body: JSON.stringify(connectPlayer),
     });
 
-    this.stomp.watch('/topic/match.join').subscribe((message) => {
-      console.log(message);
-      
-    });
+    this.subscribeToGameEvents();
+  }
 
-    this.stomp.watch('/topic/game.created').subscribe((message) => {
-      const game = JSON.parse(message.body) as GameDto;
-      this.newGameCreated.next(game);
+  createGame(command: CreateGameCommand): void {
+    this.stomp.publish({
+      destination: '/app/game/create',
+      body: JSON.stringify(command),
+    });
+  }
+
+  createAnonymousGame(command: CreateAnonymousGameCommand): void {
+    this.stomp.publish({
+      destination: '/app/game/createAnonymous',
+      body: JSON.stringify(command),
+    });
+  }
+
+  cancelGame(gameId: string): void {
+    const command: CancelGameCommand = {
+      gameId: gameId,
+    };
+
+    this.stomp.publish({
+      destination: '/app/game/cancel',
+      body: JSON.stringify(command),
     });
   }
 
@@ -72,5 +94,22 @@ export class MatchService {
 
   disconnect(): void {
     this.stomp.deactivate();
+  }
+
+  private subscribeToGameEvents(): void {
+    this.stomp.watch('/topic/match.join').subscribe((message) => {
+      const game = JSON.parse(message.body) as GameDto;
+      this.gameRemoved.next(game);
+    });
+
+    this.stomp.watch('/topic/game.created').subscribe((message) => {
+      const game = JSON.parse(message.body) as GameDto;
+      this.gameAdded.next(game);
+    });
+
+    this.stomp.watch('/topic/game.cancelled').subscribe((message) => {
+      const game = JSON.parse(message.body) as GameDto;
+      this.gameRemoved.next(game);
+    });
   }
 }

@@ -171,4 +171,10 @@ public class GameService {
         game.setStatus(GameStatus.ABORTED);
         return gameRepository.save(game);
     }
+
+    public Game cancelGame(UUID gameId) {
+        var game = gameRepository.findById(gameId).orElseThrow();
+        game.setStatus(GameStatus.CANCELLED);
+        return gameRepository.save(game);
+    }
 }

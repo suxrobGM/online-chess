@@ -5,3 +5,4 @@ export * from './gameStatus';
 export * from './getGamesQuery';
 export * from './joinGameCommand';
 export * from './connectPlayerCommand';
+export * from './cancelGameCommand';

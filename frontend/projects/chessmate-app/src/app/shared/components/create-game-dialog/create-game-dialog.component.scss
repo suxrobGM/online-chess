@@ -20,7 +20,11 @@
 .color-submits__button:hover {
   background: linear-gradient(to bottom, hsl(37, 7%, 25%), hsl(37, 5%, 22%) 100%);
   color: #ccc;
+}
 
+.color-submits__button.selected {
+  background: linear-gradient(to bottom, hsl(0deg 0% 35%), hsl(0deg 1% 40%) 100%);
+  color: #ccc;
 }
 
 .color-submits__button i {

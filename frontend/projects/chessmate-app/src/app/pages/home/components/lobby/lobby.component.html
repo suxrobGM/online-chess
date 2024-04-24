@@ -1,7 +1,7 @@
 <h4>Lobby</h4>
 
 <p-table [value]="openGames" [paginator]="true" [lazy]="true" [rows]="10" (onLazyLoad)="loadGames($event)"
-  [(first)]="first" [totalRecords]="totalRecords" [loading]="isLoading">
+  [(first)]="first" [loading]="isLoading">
   <ng-template pTemplate="header">
     <tr>
       <th>Color</th>

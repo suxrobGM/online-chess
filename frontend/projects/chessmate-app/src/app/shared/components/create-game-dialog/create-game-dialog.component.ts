@@ -1,11 +1,12 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {Subscription} from 'rxjs';
 import {DialogModule} from 'primeng/dialog';
 import {DropdownModule} from 'primeng/dropdown';
 import {ButtonModule} from 'primeng/button';
 import {TooltipModule} from 'primeng/tooltip';
 import {ProgressSpinnerModule} from 'primeng/progressspinner';
-import {ApiService, AuthService, PlayerService} from '@chessmate-app/core/services';
+import {AuthService, MatchService, PlayerService} from '@chessmate-app/core/services';
 import {
   CreateAnonymousGameCommand,
   CreateGameCommand,
@@ -27,7 +28,10 @@ import {
     ProgressSpinnerModule,
   ],
 })
-export class CreateGameDialogComponent {
+export class CreateGameDialogComponent implements OnInit, OnDestroy {
+  private readonly playerId: string;
+  private gameAddedSubscription?: Subscription;
+  private createdGameId: string | null = null;
   public isLoading = false;
   public form: FormGroup<CreateGameForm>;
   public timeControlOptions = ['Unlimited', 'Bullet', 'Blitz', 'Rapid', 'Classical'];
@@ -40,9 +44,9 @@ export class CreateGameDialogComponent {
   public visibleChange = new EventEmitter<boolean>();
 
   constructor(
-    private readonly apiService: ApiService,
     private readonly authService: AuthService,
     private readonly playerService: PlayerService,
+    private readonly matchService: MatchService,
   )
   { 
     this.form = new FormGroup<CreateGameForm>({
@@ -51,16 +55,41 @@ export class CreateGameDialogComponent {
       ratingRange: new FormControl('', {nonNullable: true}),
       hostColor: new FormControl(null, {nonNullable: false}), // null means random color
     });
+
+    this.playerId = this.playerService.getPlayerId();
+  }
+
+  ngOnInit(): void {
+    this.gameAddedSubscription = this.matchService.gameAdded$.subscribe((game) => {
+      if (game.hostPlayerId === this.playerId) {
+        this.createdGameId = game.id;
+      }
+    });
+  }
+  
+  ngOnDestroy(): void {
+    console.log('Destroying create game dialog');
+    this.gameAddedSubscription?.unsubscribe();
+    
+    if (this.createdGameId) {
+      this.matchService.cancelGame(this.createdGameId);
+    }
   }
 
   show(): void {
     this.visible = true;
+    this.isLoading = false;
     this.visibleChange.emit(true);
   }
 
   hide(): void {
+    if (this.createdGameId) {
+      this.matchService.cancelGame(this.createdGameId);
+    }
+
     this.visible = false;
     this.visibleChange.emit(false);
+    this.resetForm();
   }
 
   createGame(): void {
@@ -97,26 +126,26 @@ export class CreateGameDialogComponent {
 
   private createAnonymousGame() {
     const command: CreateAnonymousGameCommand = {
-      hostPlayerId: this.playerService.getPlayerId(),
+      hostPlayerId: this.playerId,
       hostPlayerColor: this.form.controls.hostColor.value,
     };
 
-    this.apiService.createAnonymousGame(command).subscribe((game) => {
-      this.isLoading = false;
-      console.log(game);
-    });
+    this.matchService.createAnonymousGame(command);
   }
 
   private createAuthenticatedGame() {
     const command: CreateGameCommand = {
-      hostPlayerId: this.playerService.getPlayerId(),
+      hostPlayerId: this.playerId,
       hostPlayerColor: this.form.controls.hostColor.value,
     };
 
-    this.apiService.createGame(command).subscribe((game) => {
-      this.isLoading = false;
-      console.log(game);
-    });
+    this.matchService.createGame(command);
+  }
+
+  private resetForm(): void {
+    this.isLoading = false;
+    this.createdGameId = null;
+    this.form.reset();
   }
 }
 

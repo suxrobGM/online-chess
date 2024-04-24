@@ -1,5 +1,6 @@
 package com.silyosbekov.chessmate.controller;
 
+import com.silyosbekov.chessmate.dto.CancelGameCommand;
 import com.silyosbekov.chessmate.dto.CreateAnonymousGameCommand;
 import com.silyosbekov.chessmate.dto.CreateGameCommand;
 import com.silyosbekov.chessmate.dto.GameDto;
@@ -38,6 +39,18 @@ public class GameController {
     @SendTo("/topic/game.created")
     public GameDto createAnonymousGame(@RequestBody CreateAnonymousGameCommand command) {
         var game = gameService.createNewAnonymousGame(command.hostPlayerId(), command.hostPlayerColor());
+        return GameMapper.toDto(game);
+    }
+
+    /**
+     * Cancel a game that has not started yet
+     * @param command - the game to cancel, with the host player's ID
+     * @return The cancelled game as a DTO
+     */
+    @MessageMapping("/game/cancel")
+    @SendTo("/topic/game.cancelled")
+    public GameDto cancelGame(@RequestBody CancelGameCommand command) {
+        var game = gameService.cancelGame(command.gameId());
         return GameMapper.toDto(game);
     }
 }

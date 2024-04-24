@@ -129,7 +129,7 @@ public class MatchService {
         }
 
         game = activeGame;
-        game.setStatus(GameStatus.ABANDONED);
+        game.setStatus(GameStatus.CANCELLED);
 
         // Schedule a timer to complete the abandoned game after 1 minute
         var timer = new Timer();

@@ -1,6 +1,7 @@
-import {Component} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {TableLazyLoadEvent, TableModule} from 'primeng/table';
 import {ButtonModule} from 'primeng/button';
+import {Subscription} from 'rxjs';
 import {GameDto, GameStatus, GetGamesQuery, PlayerColor} from '@chessmate-app/core/models';
 import {ApiService, MatchService} from '@chessmate-app/core/services';
 import {SortUtils} from '@chessmate-app/shared/utils';
@@ -16,9 +17,10 @@ import {SortUtils} from '@chessmate-app/shared/utils';
     ButtonModule,
   ],
 })
-export class LobbyComponent {
+export class LobbyComponent implements OnInit, OnDestroy {
+  private gameAddedSubscription?: Subscription;
+  private gameRemovedSubscription?: Subscription;
   public isLoading = true;
-  public totalRecords = 0;
   public first = 0;
   public openGames: GameDto[] = [];
 
@@ -26,6 +28,21 @@ export class LobbyComponent {
     private readonly apiService: ApiService,
     private readonly matchService: MatchService)
   {
+  }
+
+  ngOnInit(): void {
+    this.gameAddedSubscription = this.matchService.gameAdded$.subscribe((game) => {
+      this.openGames = [game, ...this.openGames];
+    });
+
+    this.gameRemovedSubscription = this.matchService.gameRemoved$.subscribe((game) => {
+      this.openGames = this.openGames.filter((g) => g.id !== game.id);
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.gameAddedSubscription?.unsubscribe();
+    this.gameRemovedSubscription?.unsubscribe();
   }
 
   loadGames(event: TableLazyLoadEvent) {

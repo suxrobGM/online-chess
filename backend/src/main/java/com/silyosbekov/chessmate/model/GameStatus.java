@@ -7,5 +7,5 @@ public enum GameStatus {
     RESIGNED,
     COMPLETED,
     ABORTED,
-    ABANDONED
+    CANCELLED
 }
