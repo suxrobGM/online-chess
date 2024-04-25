@@ -3,5 +3,6 @@
     [darkTileColor]="blackSquareColor"
     [pieceIcons]="pieceIcons"
     [size]="size"
-    [showLastMove]="true">
+    [showLastMove]="true"
+    (moveChange)="emitMoveChangeEvent($event)">
 </ngx-chess-board>

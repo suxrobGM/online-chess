@@ -1,6 +1,9 @@
 <div class="row">
   <div class="col-12 col-md-8">
-    <app-chessboard #chessboardRef [orientation]="boardOrientation"></app-chessboard>
+    <app-chessboard #chessboardRef 
+      [orientation]="boardOrientation"
+      (moveChange)="sendMove($event)">
+    </app-chessboard>
   </div>
   <div class="col-12 col-md-4">
     <div class="d-flex flex-column gap-2">
@@ -26,7 +29,7 @@
         <p>Game Status: {{game?.status}}</p>
   
         <div class="d-flex gap-1">
-          <p-button label="Cancel" (click)="cancelGame()" [disabled]="isLoading"></p-button>
+          <!-- <p-button label="Cancel" (click)="cancelGame()" [disabled]="isLoading"></p-button> -->
           <p-button label="Resign" (click)="resignGame()" [disabled]="isLoading"></p-button>
           <p-button label="Offer Draw" (click)="offerDraw()" [disabled]="isLoading"></p-button>
         </div>

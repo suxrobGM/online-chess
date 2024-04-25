@@ -1,9 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   AfterViewInit,
   Component,
+  EventEmitter,
   HostListener,
   Input,
   OnInit,
+  Output,
   ViewChild,
 } from '@angular/core';
 import {
@@ -35,6 +38,9 @@ export class ChessboardComponent implements OnInit, AfterViewInit {
 
   @Input()
   public orientation: 'white' | 'black' = 'white';
+
+  @Output()
+  public moveChange = new EventEmitter<any>();
 
   constructor() {
     this.pieceIcons = {
@@ -75,6 +81,10 @@ export class ChessboardComponent implements OnInit, AfterViewInit {
 
   move(from: string, to: string) {
     this.boardRef.move(from + to);
+  }
+
+  emitMoveChangeEvent(event: any) {
+    this.moveChange.emit(event);
   }
 
   @HostListener('window:resize', ['$event'])

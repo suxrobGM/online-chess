@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
 import {ToastModule} from 'primeng/toast';
 import {
-  AuthService,
+  //AuthService,
   MatchService,
   PlayerService,
   ThemeService,

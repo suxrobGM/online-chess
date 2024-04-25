@@ -1,6 +1,7 @@
 package com.silyosbekov.chessmate.service;
 
 import com.silyosbekov.chessmate.core.Pair;
+import com.silyosbekov.chessmate.dto.MakeMoveCommand;
 import com.silyosbekov.chessmate.dto.MoveDto;
 import com.silyosbekov.chessmate.engine.Chess;
 import com.silyosbekov.chessmate.engine.Pgn;
@@ -174,25 +175,31 @@ public class MatchService {
         gameRepository.save(game);
     }
 
-    public MoveDto makeMove(UUID gameId, String from, String to)  {
-        var activeGame = activeGames.get(gameId);
+    public MoveDto makeMove(MakeMoveCommand command)  {
+        var activeGame = activeGames.get(command.gameId());
 
         if (activeGame == null) {
-            throw new NoSuchElementException("Game with ID '%s' does not exist".formatted(gameId));
+            throw new NoSuchElementException("Game with ID '%s' does not exist".formatted(command.gameId()));
         }
 
-        var move = activeGame.item2().move(new MoveOptions(from, to, null, null, true));
-
-        if (move == null) {
-            throw new IllegalArgumentException("Invalid move");
-        }
+        // TODO: Fix engine move validation error
+//        var move = activeGame.item2().move(new MoveOptions(command.from(), command.to(), null, null, true));
+//
+//        if (move == null) {
+//            throw new IllegalArgumentException("Invalid move");
+//        }
 
         var whitePlayerId = activeGame.item1().getWhitePlayerId();
         var blackPlayerId = activeGame.item1().getBlackPlayerId();
 
-        // var moveSan = from + to;
-        // var pgn = Pgn.fromString(activeGame.item1().getPgn());
-        // return new MoveDto(gameId, from, to, moveSan, activeGame.item2().pgn());
-        return new MoveDto(gameId, whitePlayerId, blackPlayerId, from, to, move.getSan(), activeGame.item1().getPgn());
+        return new MoveDto(
+                command.gameId(),
+                whitePlayerId,
+                blackPlayerId,
+                command.color(),
+                command.from(),
+                command.to(),
+                command.isCheckmate(),
+                command.isStalemate());
     }
 }

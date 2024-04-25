@@ -19,7 +19,7 @@ public class InternalMove {
         promotion = null;
     }
 
-    public InternalMove(char color, int from, int to, char piece, char captured, int flags) {
+    public InternalMove(char color, int from, int to, char piece, Character captured, int flags) {
         this.color = color;
         this.from = from;
         this.to = to;
@@ -29,7 +29,7 @@ public class InternalMove {
         promotion = null;
     }
 
-    public InternalMove(char color, int from, int to, char piece, char captured, char promotion, int flags) {
+    public InternalMove(char color, int from, int to, char piece, Character captured, char promotion, int flags) {
         this.color = color;
         this.from = from;
         this.to = to;

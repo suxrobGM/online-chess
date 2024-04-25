@@ -36,7 +36,7 @@ public class MatchController {
     //@SendToUser("/topic/match.update")
     @SendTo("/topic/match.update")
     public MoveDto makeMove(MakeMoveCommand command) {
-        var moveDto = matchService.makeMove(command.gameId(), command.from(), command.to());
+        var moveDto = matchService.makeMove(command);
         sendToPlayer(moveDto.whitePlayerId(), "/topic/match.update", moveDto);
         sendToPlayer(moveDto.blackPlayerId(), "/topic/match.update", moveDto);
         return moveDto;
