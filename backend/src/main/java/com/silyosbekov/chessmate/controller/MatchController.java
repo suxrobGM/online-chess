@@ -2,7 +2,6 @@ package com.silyosbekov.chessmate.controller;
 
 import com.silyosbekov.chessmate.dto.*;
 import com.silyosbekov.chessmate.mapper.GameMapper;
-import com.silyosbekov.chessmate.model.Game;
 import com.silyosbekov.chessmate.service.MatchService;
 import com.silyosbekov.chessmate.service.OnlinePlayersService;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -33,12 +32,11 @@ public class MatchController {
      * @param command represents the move made by a player, including game ID, player ID, and the move details.
      */
     @MessageMapping("/match/move")
-    //@SendToUser("/topic/match.update")
-    @SendTo("/topic/match.update")
+    @SendTo("/topic/match.moveReceived")
     public MoveDto makeMove(MakeMoveCommand command) {
         var moveDto = matchService.makeMove(command);
-        sendToPlayer(moveDto.whitePlayerId(), "/topic/match.update", moveDto);
-        sendToPlayer(moveDto.blackPlayerId(), "/topic/match.update", moveDto);
+        //sendToPlayer(moveDto.whitePlayerId(), "/topic/match/move.received", moveDto);
+        //sendToPlayer(moveDto.blackPlayerId(), "/topic/match/move.received", moveDto);
         return moveDto;
     }
 
@@ -47,13 +45,12 @@ public class MatchController {
      * @param command contains information necessary to start a new game, such as player IDs.
      */
     @MessageMapping("/match/join")
-    //@SendToUser("/topic/match.join")
     @SendTo("/topic/match.join")
     public GameDto joinGame(JoinGameCommand command) {
         var game = matchService.joinGame(command.gameId(), command.playerId());
         var gameDto = GameMapper.toDto(game);
-        sendToPlayer(command.playerId(), "/topic/match.join", gameDto);
-        sendToPlayer(game.getHostPlayerId(), "/topic/match.join", gameDto);
+        // sendToPlayer(command.playerId(), "/topic/match/join", gameDto);
+        // sendToPlayer(game.getHostPlayerId(), "/topic/match/join", gameDto);
         return gameDto;
     }
 
@@ -67,9 +64,37 @@ public class MatchController {
     public GameDto joinAnonymousGame(JoinGameCommand command) {
         var game = matchService.joinAnonymousGame(command.gameId(), command.playerId());
         var gameDto = GameMapper.toDto(game);
-        sendToPlayer(command.playerId(), "/topic/match.join", gameDto);
-        sendToPlayer(game.getHostPlayerId(), "/topic/match.join", gameDto);
+        // sendToPlayer(command.playerId(), "/topic/match.join", gameDto);
+        // sendToPlayer(game.getHostPlayerId(), "/topic/match.join", gameDto);
         return gameDto;
+    }
+
+    @MessageMapping("/match/offerDraw")
+    @SendTo("/topic/match.receivedDrawOffer")
+    public GameDto offerDraw(OfferDrawCommand command) {
+        var game = matchService.getActiveGame(command.gameId());
+        return GameMapper.toDto(game);
+    }
+
+    @MessageMapping("/match/acceptDraw")
+    @SendTo("/topic/match.acceptedDraw")
+    public GameDto acceptDraw(AcceptDrawCommand command) {
+        var game = matchService.drawGame(command.gameId());
+        return GameMapper.toDto(game);
+    }
+
+    @MessageMapping("/match/declineDraw")
+    @SendTo("/topic/match.declinedDraw")
+    public GameDto declineDraw(DeclineDrawCommand command) {
+        var game = matchService.getActiveGame(command.gameId());
+        return GameMapper.toDto(game);
+    }
+
+    @MessageMapping("/match/resign")
+    @SendTo("/topic/match.resigned")
+    public GameDto resignGame(ResignGameCommand command) {
+        var game = matchService.resignGame(command.gameId(), command.playerId());
+        return GameMapper.toDto(game);
     }
 
     /**
@@ -77,12 +102,12 @@ public class MatchController {
      * @param command contains information necessary to end the game, such as player IDs.
      */
     @MessageMapping("/match/leave")
-    //@SendToUser("/topic/match.leave")
+    @SendTo("/topic/match.playerLeft")
     public GameDto leaveGame(LeaveGameCommand command) {
         var game = matchService.leaveGame(command.gameId(), command.playerId());
         var gameDto = GameMapper.toDto(game);
-        sendToPlayer(command.playerId(), "/topic/match.leave", gameDto);
-        sendToPlayer(game.getHostPlayerId(), "/topic/match.leave", gameDto);
+        // sendToPlayer(command.playerId(), "/topic/match.playerLeft", gameDto);
+        // sendToPlayer(game.getHostPlayerId(), "/topic/match.playerLeft", gameDto);
         return gameDto;
     }
 

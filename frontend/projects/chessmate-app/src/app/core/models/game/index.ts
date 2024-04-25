@@ -9,3 +9,7 @@ export * from './cancelGameCommand';
 export * from './makeMoveCommand';
 export * from './moveDto';
 export * from './playerColor';
+export * from './acceptDrawCommand';
+export * from './offerDrawCommand';
+export * from './declineDrawCommand';
+export * from './resignGameCommand';

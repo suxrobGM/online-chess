@@ -31,6 +31,7 @@ export class GameComponent implements OnInit, OnDestroy {
   public game: GameDto | null = null;
   public boardOrientation: 'white' | 'black' = 'white';
   public pgn = '';
+  public currentTurn?: PlayerColor;
 
   @ViewChild('chessboardRef')
   private chessboardRef?: ChessboardComponent;
@@ -43,6 +44,7 @@ export class GameComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.game = this.matchService.getCurrentMatch();
+    this.currentTurn = this.game?.currentTurn;
 
     this.receivedMoveSubscription = this.matchService.receivedMove$.subscribe((move) => {
       if (!this.chessboardRef) {
@@ -50,6 +52,7 @@ export class GameComponent implements OnInit, OnDestroy {
       }
 
       this.chessboardRef.move(move.from, move.to);
+      this.currentTurn = move.color === PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE;
       this.pgn = this.chessboardRef.getPgn();
     });
 

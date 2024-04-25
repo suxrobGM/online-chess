@@ -46,7 +46,7 @@ export class ApiService {
     let url = `/games`;
 
     if (query?.gameStatus != null) {
-      //url += `?gameStatus=${query.gameStatus}`;
+      // url += `?gameStatus=${query.gameStatus}`;
     }
     return this.get(url);
   }

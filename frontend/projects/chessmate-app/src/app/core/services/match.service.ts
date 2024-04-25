@@ -121,7 +121,7 @@ export class MatchService {
       this.router.navigate(['/game']);
     });
 
-    this.stomp.watch('/topic/match.update').subscribe((message) => {
+    this.stomp.watch('/topic/match.moveReceived').subscribe((message) => {
       const move = JSON.parse(message.body) as MoveDto;
       this.receivedMove.next(move);
     });

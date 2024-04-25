@@ -30,6 +30,10 @@ public class MatchService {
         this.playerRepository = playerRepository;
     }
 
+    public Game getActiveGame(UUID gameId) {
+        return activeGames.get(gameId).item1();
+    }
+
     /**
      * Join a game with a player.
      * @param gameId The ID of the game to join
@@ -201,5 +205,61 @@ public class MatchService {
                 command.to(),
                 command.isCheckmate(),
                 command.isStalemate());
+    }
+
+    /**
+     * Resign from a game
+     * @param gameId The ID of the game to resign from
+     * @param playerId The ID of the player who is resigning
+     * @throws NoSuchElementException if the game does not exist or if the player does not exist in the game
+     * @return The updated game
+     */
+    public Game resignGame(UUID gameId, UUID playerId) {
+        var game = gameRepository.findById(gameId).orElseThrow();
+        var pgn = Pgn.fromString(game.getPgn());
+
+        if (game.getWhitePlayerId().equals(playerId)) { // White player resigned
+            game.setWinnerPlayer(PlayerColor.WHITE); // Black player wins
+            pgn.setBlackWinResult();
+        }
+        else if (game.getBlackPlayerId().equals(playerId)) { // Black player resigned
+            game.setWinnerPlayer(PlayerColor.BLACK); // White player wins
+            pgn.setWhiteWinResult();
+        }
+        else {
+            throw new NoSuchElementException("Player with '%s' does not exist in the game".formatted(playerId));
+        }
+
+        game.setStatus(GameStatus.RESIGNED);
+        game.setPgn(pgn.toString());
+        return gameRepository.save(game);
+    }
+
+    /**
+     * Draw a game
+     * @param gameId The ID of the game to draw
+     * @throws NoSuchElementException if the game does not exist
+     * @return The updated game
+     */
+    public Game drawGame(UUID gameId) {
+        var game = gameRepository.findById(gameId).orElseThrow();
+        var pgn = Pgn.fromString(game.getPgn());
+        pgn.setDrawResult();
+
+        game.setStatus(GameStatus.DRAW);
+        game.setPgn(pgn.toString());
+        return gameRepository.save(game);
+    }
+
+    /**
+     * Abort a game
+     * @param gameId The ID of the game to abort
+     * @throws NoSuchElementException if the game does not exist
+     * @return The updated game
+     */
+    public Game abortGame(UUID gameId) {
+        var game = gameRepository.findById(gameId).orElseThrow();
+        game.setStatus(GameStatus.ABORTED);
+        return gameRepository.save(game);
     }
 }
