@@ -8,3 +8,4 @@ export * from './connectPlayerCommand';
 export * from './cancelGameCommand';
 export * from './makeMoveCommand';
 export * from './moveDto';
+export * from './playerColor';

@@ -45,10 +45,9 @@ export class ApiService {
   getGames(query?: GetGamesQuery): Observable<GameDto[]> {
     let url = `/games`;
 
-    if (query?.gameStatus) {
-      url += `?gameStatus=${query.gameStatus}`;
+    if (query?.gameStatus != null) {
+      //url += `?gameStatus=${query.gameStatus}`;
     }
-
     return this.get(url);
   }
 

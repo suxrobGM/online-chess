@@ -120,7 +120,7 @@ export class CreateGameDialogComponent implements OnInit, OnDestroy {
     this.setHostColor(null);
   }
 
-  private setHostColor(color: number | null): void {
+  private setHostColor(color: PlayerColor | null): void {
     this.form.controls.hostColor.setValue(color);
   }
 

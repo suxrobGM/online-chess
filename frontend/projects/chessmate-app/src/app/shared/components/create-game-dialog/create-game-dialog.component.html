@@ -20,7 +20,7 @@
       
       <div class="color-submits">
         <button type="button" class="btn color-submits__button" [pTooltip]="'Black color'" [tooltipPosition]="'bottom'"
-          [class]="{'selected': form.value.hostColor === 1}" (click)="setBlackHostColor()">
+          [class]="{'selected': form.value.hostColor === 'BLACK'}" (click)="setBlackHostColor()">
           <i style="background-image: url('/assets/colors/black-piece.svg');"></i>
         </button>
         <button type="button" class="btn color-submits__button random" [pTooltip]="'Random color'"
@@ -28,7 +28,7 @@
           <i style="background-image: url('/assets/colors/random-piece.svg');"></i>
         </button>
         <button type="button" class="btn color-submits__button" [pTooltip]="'White color'" [tooltipPosition]="'bottom'"
-          [class]="{'selected': form.value.hostColor === 0}" (click)="setWhiteHostColor()">
+          [class]="{'selected': form.value.hostColor === 'WHITE'}" (click)="setWhiteHostColor()">
           <i style="background-image: url('/assets/colors/white-piece.svg');"></i>
         </button>
       </div>

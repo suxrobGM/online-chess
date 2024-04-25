@@ -19,7 +19,7 @@ public class GameRestController {
     }
 
     @GetMapping("/api/games")
-    public ResponseEntity<List<GameDto>> getGame(@RequestParam(required = false) GameStatus gameStatus) {
+    public ResponseEntity<List<GameDto>> getGame(@RequestParam(name = "gameStatus", required = false) GameStatus gameStatus) {
         var games = gameService.getGames(gameStatus);
         var gamesDto = new ArrayList<GameDto>();
 

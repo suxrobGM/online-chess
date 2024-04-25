@@ -1,4 +1,4 @@
-import {PlayerColor} from '../playerColor';
+import {PlayerColor} from './playerColor';
 
 export interface CreateAnonymousGameCommand {
   hostPlayerId: string;

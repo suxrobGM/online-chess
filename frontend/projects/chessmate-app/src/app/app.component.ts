@@ -1,8 +1,14 @@
 import {Component, OnInit} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
 import {ToastModule} from 'primeng/toast';
-import {AuthService, MatchService, ThemeService} from '@chessmate-app/core/services';
+import {
+  AuthService,
+  MatchService,
+  PlayerService,
+  ThemeService,
+} from '@chessmate-app/core/services';
 import {TopbarComponent} from '@chessmate-app/layout';
+
 
 @Component({
   selector: 'app-root',
@@ -15,13 +21,17 @@ import {TopbarComponent} from '@chessmate-app/layout';
   ],
 })
 export class AppComponent implements OnInit {
+  public playerId: string;
+
   constructor(
     //private readonly authService: AuthService,
     private readonly matchService: MatchService,
     private readonly themeService: ThemeService,
+    private readonly playerService: PlayerService,
   )
   {
     this.themeService.applyThemeFromStorage();
+    this.playerId = this.playerService.getPlayerId();
   }
 
   ngOnInit(): void {

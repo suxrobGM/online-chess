@@ -1,4 +1,4 @@
-import {PlayerColor} from '../playerColor';
+import {PlayerColor} from './playerColor';
 import {GameStatus} from './gameStatus';
 
 export interface GameDto {
@@ -15,7 +15,7 @@ export interface GameDto {
   blackPlayerElo?: number;
   winnerPlayer?: PlayerColor;
   status: GameStatus;
-  currentTurnPlayer?: PlayerColor;
+  currentTurn?: PlayerColor;
   isRanked: boolean;
   isTimerEnabled: boolean;
   pgn: string;

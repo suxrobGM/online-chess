@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   Component,
   HostListener,
   Input,
@@ -6,8 +7,8 @@ import {
   ViewChild,
 } from '@angular/core';
 import {
+  NgxChessBoardComponent,
   NgxChessBoardModule,
-  NgxChessBoardView,
   PieceIconInput,
 } from 'ngx-chess-board';
 
@@ -17,11 +18,11 @@ import {
   templateUrl: './chessboard.component.html',
   imports: [NgxChessBoardModule],
 })
-export class ChessboardComponent implements OnInit {
+export class ChessboardComponent implements OnInit, AfterViewInit {
   public size = 500;
   
   @ViewChild('board') 
-  public boardRef!: NgxChessBoardView;
+  public boardRef!: NgxChessBoardComponent;
 
   @Input()
   public blackSquareColor = '#b96331';
@@ -31,6 +32,9 @@ export class ChessboardComponent implements OnInit {
 
   @Input()
   public pieceIcons: PieceIconInput;
+
+  @Input()
+  public orientation: 'white' | 'black' = 'white';
 
   constructor() {
     this.pieceIcons = {
@@ -51,6 +55,18 @@ export class ChessboardComponent implements OnInit {
 
   ngOnInit() {
     this.resizeBoard();
+  }
+
+  ngAfterViewInit(): void {
+    if (this.orientation === 'black') {
+      setTimeout(() => {
+        this.reverseBoard();
+      }, 1);
+    }
+  }
+
+  getPgn(): string {
+    return this.boardRef.getPGN();
   }
 
   reverseBoard() {

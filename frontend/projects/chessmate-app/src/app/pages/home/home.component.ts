@@ -3,7 +3,6 @@ import {CommonModule} from '@angular/common';
 import {ButtonModule} from 'primeng/button';
 import {ChessboardComponent} from '@chessmate-app/shared/components';
 import {LobbyComponent} from './components';
-import { PlayerService } from '@chessmate-app/core/services';
 
 @Component({
   selector: 'app-home',
@@ -18,9 +17,4 @@ import { PlayerService } from '@chessmate-app/core/services';
   ],
 })
 export class HomeComponent {
-  public playerId: string;
-
-  constructor(private readonly playerService: PlayerService) {
-    this.playerId = this.playerService.getPlayerId();
-  }
 }
