@@ -20,7 +20,9 @@
       <td>--</td>
       <td>Classic</td>
       <td>
-        <p-button label="Join" (click)="joinGame(game)" [disabled]="isLoading"></p-button>
+        @if (game.hostPlayerId !== playerId) {
+          <p-button label="Join" (click)="joinGame(game)" [disabled]="isLoading"></p-button>
+        }
       </td>
     </tr>
   </ng-template>

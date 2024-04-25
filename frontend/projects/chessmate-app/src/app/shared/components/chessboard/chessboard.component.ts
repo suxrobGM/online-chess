@@ -53,6 +53,14 @@ export class ChessboardComponent implements OnInit {
     this.resizeBoard();
   }
 
+  reverseBoard() {
+    this.boardRef.reverse();
+  }
+
+  move(from: string, to: string) {
+    this.boardRef.move(from + to);
+  }
+
   @HostListener('window:resize', ['$event'])
   onResize() {
     this.resizeBoard();

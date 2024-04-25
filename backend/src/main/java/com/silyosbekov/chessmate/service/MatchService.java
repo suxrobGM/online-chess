@@ -70,17 +70,21 @@ public class MatchService {
         if (secondPlayerColor == PlayerColor.WHITE) {
             if (secondPlayerName.equals("Anonymous")) {
                 game.setWhiteAnonymousPlayerId(playerId);
+                game.setBlackAnonymousPlayerId(game.getHostPlayerId());
             }
             else {
                 game.setWhitePlayer(player);
+                game.setBlackPlayer(game.getHostPlayer());
             }
         }
         else {
             if (secondPlayerName.equals("Anonymous")) {
                 game.setBlackAnonymousPlayerId(playerId);
+                game.setWhiteAnonymousPlayerId(game.getHostPlayerId());
             }
             else {
                 game.setBlackPlayer(player);
+                game.setWhitePlayer(game.getHostPlayer());
             }
         }
 
@@ -97,8 +101,8 @@ public class MatchService {
         }
 
         pgn.setWhiteTurn();
+        game.setCurrentTurn(PlayerColor.WHITE);
         game.setPgn(pgn.toString());
-        // activeGames.put(game.getId(), Pair.of(game, new Chess()));
         activeGames.put(game.getId(), Pair.of(game, new Chess()));
         return gameRepository.save(game);
     }

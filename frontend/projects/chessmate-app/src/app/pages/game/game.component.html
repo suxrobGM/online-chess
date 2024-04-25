@@ -1,1 +1,22 @@
-<app-chessboard></app-chessboard>
+<div class="row">
+  <div class="col-12 col-md-8">
+    <app-chessboard #chessboardRef></app-chessboard>
+  </div>
+  <div class="col-12 col-md-4">
+    <p-card>
+      <h4>Game Info</h4>
+      <p>White Player: {{game?.whitePlayerUsername}} - <span>{{game?.whitePlayerElo}}</span></p>
+      <p>Black Player: {{game?.blackPlayerUsername}} - <span>{{game?.whitePlayerElo}}</span></p>
+      <p>White Player ID: {{game?.whitePlayerId}}</p>
+      <p>Black Player ID: {{game?.blackPlayerId}}</p>
+      <p>Turn: {{game?.currentTurnPlayer}}</p>
+      <p>Game Status: {{game?.status}}</p>
+
+      <div class="d-flex gap-1">
+        <p-button label="Cancel" (click)="cancelGame()" [disabled]="isLoading"></p-button>
+        <p-button label="Resign" (click)="resignGame()" [disabled]="isLoading"></p-button>
+        <p-button label="Offer Draw" (click)="offerDraw()" [disabled]="isLoading"></p-button>
+      </div>
+    </p-card>
+  </div>
+</div>

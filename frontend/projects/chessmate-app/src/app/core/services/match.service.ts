@@ -10,6 +10,8 @@ import {
   CreateGameCommand,
   GameDto,
   JoinGameCommand,
+  MakeMoveCommand,
+  MoveDto,
 } from '@chessmate-app/core/models';
 import {PlayerService} from './player.service';
 
@@ -20,8 +22,12 @@ export class MatchService {
   private readonly baseUrl = APP_CONFIG.wsUrl;
   private readonly gameAdded = new Subject<GameDto>();
   private readonly gameRemoved = new Subject<GameDto>();
+  private readonly receivedMove = new Subject<MoveDto>();
+  private currentMatch: GameDto | null = null;
+
   public readonly gameAdded$ = this.gameAdded.asObservable();
   public readonly gameRemoved$ = this.gameRemoved.asObservable();
+  public readonly receivedMove$ = this.receivedMove.asObservable();
 
   constructor(
     private readonly playerService: PlayerService,
@@ -51,6 +57,10 @@ export class MatchService {
     });
 
     this.subscribeToGameEvents();
+  }
+
+  getCurrentMatch(): GameDto | null {
+    return this.currentMatch;
   }
 
   createGame(command: CreateGameCommand): void {
@@ -92,6 +102,13 @@ export class MatchService {
     });
   }
 
+  makeMove(command: MakeMoveCommand): void {
+    this.stomp.publish({
+      destination: '/app/match/move',
+      body: JSON.stringify(command),
+    });
+  }
+
   disconnect(): void {
     this.stomp.deactivate();
   }
@@ -100,6 +117,13 @@ export class MatchService {
     this.stomp.watch('/topic/match.join').subscribe((message) => {
       const game = JSON.parse(message.body) as GameDto;
       this.gameRemoved.next(game);
+      this.currentMatch = game;
+      this.router.navigate(['/game']);
+    });
+
+    this.stomp.watch('/topic/match.update').subscribe((message) => {
+      const move = JSON.parse(message.body) as MoveDto;
+      this.receivedMove.next(move);
     });
 
     this.stomp.watch('/topic/game.created').subscribe((message) => {

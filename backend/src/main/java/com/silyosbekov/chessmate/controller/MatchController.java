@@ -2,9 +2,11 @@ package com.silyosbekov.chessmate.controller;
 
 import com.silyosbekov.chessmate.dto.*;
 import com.silyosbekov.chessmate.mapper.GameMapper;
+import com.silyosbekov.chessmate.model.Game;
 import com.silyosbekov.chessmate.service.MatchService;
 import com.silyosbekov.chessmate.service.OnlinePlayersService;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import java.util.UUID;
@@ -32,10 +34,12 @@ public class MatchController {
      */
     @MessageMapping("/match/move")
     //@SendToUser("/topic/match.update")
-    public void makeMove(MakeMoveCommand command) {
+    @SendTo("/topic/match.update")
+    public MoveDto makeMove(MakeMoveCommand command) {
         var moveDto = matchService.makeMove(command.gameId(), command.from(), command.to());
         sendToPlayer(moveDto.whitePlayerId(), "/topic/match.update", moveDto);
         sendToPlayer(moveDto.blackPlayerId(), "/topic/match.update", moveDto);
+        return moveDto;
     }
 
     /**
@@ -44,10 +48,13 @@ public class MatchController {
      */
     @MessageMapping("/match/join")
     //@SendToUser("/topic/match.join")
-    public void joinGame(JoinGameCommand command) {
+    @SendTo("/topic/match.join")
+    public GameDto joinGame(JoinGameCommand command) {
         var game = matchService.joinGame(command.gameId(), command.playerId());
-        sendToPlayer(game.getWhitePlayerId(), "/topic/match.join", game);
-        sendToPlayer(game.getBlackPlayerId(), "/topic/match.join", game);
+        var gameDto = GameMapper.toDto(game);
+        sendToPlayer(command.playerId(), "/topic/match.join", gameDto);
+        sendToPlayer(game.getHostPlayerId(), "/topic/match.join", gameDto);
+        return gameDto;
     }
 
     /**
@@ -56,10 +63,13 @@ public class MatchController {
      */
     @MessageMapping("/match/joinAnonymous")
     //@SendToUser("/topic/match.join")
-    public void joinAnonymousGame(JoinGameCommand command) {
+    @SendTo("/topic/match.join")
+    public GameDto joinAnonymousGame(JoinGameCommand command) {
         var game = matchService.joinAnonymousGame(command.gameId(), command.playerId());
-        sendToPlayer(game.getWhitePlayerId(), "/topic/match.join", game);
-        sendToPlayer(game.getBlackPlayerId(), "/topic/match.join", game);
+        var gameDto = GameMapper.toDto(game);
+        sendToPlayer(command.playerId(), "/topic/match.join", gameDto);
+        sendToPlayer(game.getHostPlayerId(), "/topic/match.join", gameDto);
+        return gameDto;
     }
 
     /**
@@ -68,10 +78,12 @@ public class MatchController {
      */
     @MessageMapping("/match/leave")
     //@SendToUser("/topic/match.leave")
-    public void leaveGame(LeaveGameCommand command) {
+    public GameDto leaveGame(LeaveGameCommand command) {
         var game = matchService.leaveGame(command.gameId(), command.playerId());
-        sendToPlayer(game.getWhitePlayerId(), "/topic/match.leave", game);
-        sendToPlayer(game.getBlackPlayerId(), "/topic/match.leave", game);
+        var gameDto = GameMapper.toDto(game);
+        sendToPlayer(command.playerId(), "/topic/match.leave", gameDto);
+        sendToPlayer(game.getHostPlayerId(), "/topic/match.leave", gameDto);
+        return gameDto;
     }
 
     private void sendToPlayer(UUID playerId, String destination, Object payload) {

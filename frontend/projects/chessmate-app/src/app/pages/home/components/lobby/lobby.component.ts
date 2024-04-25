@@ -3,7 +3,7 @@ import {TableLazyLoadEvent, TableModule} from 'primeng/table';
 import {ButtonModule} from 'primeng/button';
 import {Subscription} from 'rxjs';
 import {GameDto, GameStatus, GetGamesQuery, PlayerColor} from '@chessmate-app/core/models';
-import {ApiService, MatchService} from '@chessmate-app/core/services';
+import {ApiService, MatchService, PlayerService} from '@chessmate-app/core/services';
 import {SortUtils} from '@chessmate-app/shared/utils';
 
 
@@ -11,7 +11,6 @@ import {SortUtils} from '@chessmate-app/shared/utils';
   selector: 'app-lobby',
   standalone: true,
   templateUrl: './lobby.component.html',
-  styleUrl: './lobby.component.scss',
   imports: [
     TableModule,
     ButtonModule,
@@ -20,14 +19,17 @@ import {SortUtils} from '@chessmate-app/shared/utils';
 export class LobbyComponent implements OnInit, OnDestroy {
   private gameAddedSubscription?: Subscription;
   private gameRemovedSubscription?: Subscription;
+  public playerId: string;
   public isLoading = true;
   public first = 0;
   public openGames: GameDto[] = [];
 
   constructor(
     private readonly apiService: ApiService,
-    private readonly matchService: MatchService)
+    private readonly matchService: MatchService,
+    private readonly playerService: PlayerService)
   {
+    this.playerId = this.playerService.getPlayerId();
   }
 
   ngOnInit(): void {
