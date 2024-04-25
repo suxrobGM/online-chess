@@ -8,8 +8,8 @@ import {ButtonModule} from 'primeng/button';
 import {CardModule} from 'primeng/card';
 import {Subscription} from 'rxjs';
 import {HistoryMove} from 'ngx-chess-board';
-import {ChessboardComponent} from '@chessmate-app/shared/components';
-import {GameDto, MakeMoveCommand, PlayerColor} from '@chessmate-app/core/models';
+import {ChessboardComponent, GameResultDialogComponent} from '@chessmate-app/shared/components';
+import {GameDto, MakeMoveCommand, MoveDto, PlayerColor} from '@chessmate-app/core/models';
 import {MatchService, PlayerService} from '@chessmate-app/core/services';
 
 
@@ -22,16 +22,19 @@ import {MatchService, PlayerService} from '@chessmate-app/core/services';
     ChessboardComponent,
     ButtonModule,
     CardModule,
+    GameResultDialogComponent,
   ]
 })
 export class GameComponent implements OnInit, OnDestroy {
-  //private currentPlayerId: string | null = null;
+  private currentPlayerColor?: PlayerColor;
   private receivedMoveSubscription?: Subscription;
   public isLoading = false;
   public game: GameDto | null = null;
   public boardOrientation: 'white' | 'black' = 'white';
   public pgn = '';
   public currentTurn?: PlayerColor;
+  public gameResultDialogVisible = false;
+  public gameResult?: 'win' | 'lose' | 'draw';
 
   @ViewChild('chessboardRef')
   private chessboardRef?: ChessboardComponent;
@@ -46,14 +49,10 @@ export class GameComponent implements OnInit, OnDestroy {
     this.game = this.matchService.getCurrentMatch();
     this.currentTurn = this.game?.currentTurn;
 
-    this.receivedMoveSubscription = this.matchService.receivedMove$.subscribe((move) => {
-      if (!this.chessboardRef) {
-        return;
-      }
+    this.currentPlayerColor = this.game?.whitePlayerId === this.playerService.getPlayerId() ? PlayerColor.WHITE : PlayerColor.BLACK;
 
-      this.chessboardRef.move(move.from, move.to);
-      this.currentTurn = move.color === PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE;
-      this.pgn = this.chessboardRef.getPgn();
+    this.receivedMoveSubscription = this.matchService.receivedMove$.subscribe((move) => {
+      this.handleMoveUpdate(move);
     });
 
     if (this.isCurrentPlayer(this.game?.blackPlayerId)) {
@@ -96,5 +95,24 @@ export class GameComponent implements OnInit, OnDestroy {
     };
     
     this.matchService.makeMove(command);
+  }
+
+  private handleMoveUpdate(move: MoveDto) {
+    if (!this.chessboardRef) {
+      return;
+    }
+
+    this.chessboardRef.move(move.from, move.to);
+    this.currentTurn = move.color === PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE;
+    this.pgn = this.chessboardRef.getPgn();
+
+    if (move.isCheckmate) {
+      this.gameResult = this.currentPlayerColor === move.color ? 'lose' : 'win';
+      this.gameResultDialogVisible = true;
+    }
+    else if (move.isStalemate) {
+      this.gameResult = 'draw';
+      this.gameResultDialogVisible = true;
+    }
   }
 }

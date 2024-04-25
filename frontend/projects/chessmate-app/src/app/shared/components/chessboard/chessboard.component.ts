@@ -68,11 +68,16 @@ export class ChessboardComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     // Disable the opposite color and reverse the board if the orientation is black.
     if (this.orientation === 'black') {
-      this.whiteDisabled = true;
-      setTimeout(() => this.reverseBoard(), 1);
+      
+      setTimeout(() => {
+        this.reverseBoard();
+        this.whiteDisabled = true;
+      }, 1);
     }
     else {
-      this.blackDisabled = true;
+      setTimeout(() => { 
+        this.blackDisabled = true;
+      }, 1)
     }
   }
 
