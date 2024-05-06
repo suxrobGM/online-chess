@@ -26,6 +26,7 @@ ChessMate is an online chess platform where players can engage in player-versus-
 - Anonymous and authenticated user support
 
 ### Future Enhancements
+- Resign and draw game options
 - Authenticated game rooms for private matches
 - User registration and profile management
 - Leaderboard and game history tracking
