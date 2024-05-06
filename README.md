@@ -3,15 +3,14 @@ ChessMate is an online chess platform where players can engage in player-versus-
 
 ## Architectural Overview
 ### Technical Stack
-- **JDK 21** - Java Development Kit
 - **Spring Boot** - Backend framework for building REST API applications
 - **Spring Data JPA** -  Provides repository support for JPA data access
-- **PostgreSQL** - An open-source relational database
+- **Spring Websocket** - Synchronizes game state between players in real-time
+- **PostgreSQL** - An open-source relational database to store game data
 - **Flyway** - Manages database migrations
 - **JUnit** - Facilitates unit testing in Java
-- **WebSocket** -  Enables real-time, bidirectional communication between clients and servers.
-- **Auth0** - Offers authentication and authorization as a service.
-- **Angular 17** - Frontend framework to build a SPA applications
+- **Auth0** - SSO authentication
+- **Angular 17** - Frontend framework to build SPA applications
 - **PrimeNG** - Rich set of UI components for the Angular
 - **Bootstrap 5** - CSS library for quickly prototyping layouts
 
@@ -20,11 +19,25 @@ ChessMate is an online chess platform where players can engage in player-versus-
 - Repository
 - Inversion of Control / Dependency injection
 
+### Implemented Features
+- Chess board with drag-and-drop functionality
+- Real-time game synchronization using Websockets
+- Chess engine integration for validating moves (converted the [Chess.js](https://github.com/jhlywa/chess.js) library to Java)
+- Anonymous and authenticated user support
+
+### Future Enhancements
+- Authenticated game rooms for private matches
+- User registration and profile management
+- Leaderboard and game history tracking
+- Stockfish engine integration for AI opponents
+- Chat functionality between players
+- UI improvements and responsive design
+
 ## Getting Started
 To set up ChessMate locally, follow these steps:
 
 1. Install SDKs
-    - [Download](https://www.oracle.com/java/technologies/downloads) and install the JDK 21.
+    - [Download](https://www.oracle.com/java/technologies/downloads) and install the latest JDK.
     - [Download](https://nodejs.org/en/download) and install the Node.js runtime.
     - [Download](https://www.postgresql.org/download) and install PostgreSQL database.
 
@@ -36,7 +49,7 @@ To set up ChessMate locally, follow these steps:
 
 3. Modify the database connection strings in Spring Boot's [application.properties](./backend/src/main/resources/application.properties) file. Update the following sections:
     - `spring.datasource.url` - Specify the database server host address with port number and instance name.
-    - `spring.datasource.username` - Specify the the database username
+    - `spring.datasource.username` - Specify the database username
     - `spring.datasource.password` - Specify the database user password
     - `spring.flyway.url` - Same values from the `spring.datasource` values for the Flyway migration.
     - `spring.flyway.user`
@@ -59,6 +72,7 @@ To set up ChessMate locally, follow these steps:
     - Backend API: http://localhost:8000
     - Frontend UI: http://localhost:8001
 
-
-## Roadmap
-View the [roadmap gantt chart](./docs/roadmap.pdf) file to explore implemented and planned functionalities
+## Screenshots
+![Screenshot 1](./screenshots/screenshot-1.jpg)
+![Screenshot 2](./screenshots/screenshot-2.jpg)
+![Screenshot 3](./screenshots/screenshot-3.jpg)
